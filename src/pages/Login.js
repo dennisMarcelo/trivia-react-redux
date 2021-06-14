@@ -1,4 +1,7 @@
 import React from 'react';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
+import setUserAction from '../Redux/action/setUserAction';
 
 class Login extends React.Component {
   constructor() {
@@ -11,6 +14,7 @@ class Login extends React.Component {
     };
     this.handleChange = this.handleChange.bind(this);
     this.mailAndNameValidation = this.mailAndNameValidation.bind(this);
+    this.handleClick = this.handleClick.bind(this);
   }
 
   componentDidUpdate(_, prevState) {
@@ -34,8 +38,15 @@ class Login extends React.Component {
     });
   }
 
+  handleClick() {
+    // Salvar Token no LocalStorage
+    // Enviar os dados do usuario para o state do Redux
+    // Fazer requisicao a API
+  }
+
   render() {
-    const { isValidMail, isValidName } = this.state;
+    const { isValidMail, isValidName, name, email } = this.state;
+    const { setUser } = this.props;
     return (
       <section>
         <label htmlFor="name">
@@ -60,6 +71,7 @@ class Login extends React.Component {
           type="button"
           data-testid="btn-play"
           disabled={ !(isValidMail && isValidName) }
+          onClick={ () => setUser(name, email) }
         >
           Jogar
         </button>
@@ -68,4 +80,12 @@ class Login extends React.Component {
   }
 }
 
-export default Login;
+Login.propTypes = {
+  setUser: PropTypes.func.isRequired,
+};
+
+const mapDispatchToProps = (dispatch) => ({
+  setUser: (name, email) => dispatch(setUserAction(name, email)),
+});
+
+export default connect(null, mapDispatchToProps)(Login);
