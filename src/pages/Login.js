@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import logo from '../trivia.png';
 import setUserAction from '../Redux/action/setUserAction';
 
 class Login extends React.Component {
@@ -49,6 +50,12 @@ class Login extends React.Component {
     const { setUser } = this.props;
     return (
       <section>
+        <header className="App-header">
+          <img src={ logo } className="App-logo" alt="logo" />
+          <p>
+            SUA VEZ
+          </p>
+        </header>
         <label htmlFor="name">
           <input
             type="text"
