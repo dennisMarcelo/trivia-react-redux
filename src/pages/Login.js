@@ -58,6 +58,7 @@ class Login extends React.Component {
 
   render() {
     const { isValidMail, isValidName } = this.state;
+    const { history } = this.props;
 
     return (
       <section>
@@ -92,6 +93,13 @@ class Login extends React.Component {
           onClick={ () => this.handleClick() }
         >
           Jogar
+        </button>
+        <button
+          type="button"
+          data-testid="btn-settings"
+          onClick={ () => history.push('/config') }
+        >
+          Configuração
         </button>
       </section>
     );

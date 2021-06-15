@@ -3,9 +3,10 @@ import React from 'react';
 class Config extends React.Component {
   render() {
     return (
-      <section>
-        <p>Config</p>
-      </section>
+      <>
+        <h1 data-testid="settings-title">Configuração</h1>
+        <p>teste- depois apagar</p>
+      </>
     );
   }
 }
