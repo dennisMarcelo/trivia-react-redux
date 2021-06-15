@@ -10,7 +10,7 @@ class GamePlayer extends React.Component {
         <p data-testid="question-text">Question</p>
         <section>
           <button type="button" data-testid="correct-answer">Correta</button>
-          <button type="button" data-testid="wrong-answer-${index}">Erro1</button>
+          <button type="button" data-testid={ `wrong-answer-${0}` }>Erro1</button>
         </section>
       </>
     );
