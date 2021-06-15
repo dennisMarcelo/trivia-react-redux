@@ -1,10 +1,10 @@
 import { SET_USER } from './index';
 
-const setUserAction = (name, image) => ({
+const setUserAction = (name, gravatarEmail) => ({
   type: SET_USER,
   payload: {
     name,
-    image,
+    gravatarEmail,
   },
 });
 

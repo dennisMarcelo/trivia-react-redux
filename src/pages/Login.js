@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import md5 from 'crypto-js/md5';
 import logo from '../trivia.png';
 import setUserAction from '../Redux/action/setUserAction';
-import fetchToken from '../helpers/fetchs';
+import { fetchToken } from '../helpers/fetchs';
 import { saveToken } from '../helpers/store';
 
 class Login extends React.Component {
@@ -45,9 +45,9 @@ class Login extends React.Component {
   async handleClick() {
     const { setUser, history } = this.props;
     const { name, email } = this.state;
-    const image = `https://www.gravatar.com/avatar/${md5(email).toString()}`;
+    const gravatarEmail = `https://www.gravatar.com/avatar/${md5(email).toString()}`;
 
-    setUser(name, image);
+    setUser(name, gravatarEmail);
     console.log(typeof history);
 
     const token = await fetchToken();
@@ -106,16 +106,13 @@ class Login extends React.Component {
   }
 }
 
-Login.propTypes = {
-  setUser: PropTypes.func.isRequired,
-};
-
 const mapDispatchToProps = (dispatch) => ({
-  setUser: (name, image) => dispatch(setUserAction(name, image)),
+  setUser: (name, gravatarEmail) => dispatch(setUserAction(name, gravatarEmail)),
 });
 
 Login.propTypes = {
   history: PropTypes.shape(Object).isRequired,
+  setUser: PropTypes.func.isRequired,
 };
 
 export default connect(null, mapDispatchToProps)(Login);

@@ -6,7 +6,12 @@ class GamePlayer extends React.Component {
     return (
       <>
         <Header />
-        <p>GamePlayer</p>
+        <h2 data-testid="question-category">Category</h2>
+        <p data-testid="question-text">Question</p>
+        <section>
+          <button type="button" data-testid="correct-answer">Correta</button>
+          <button type="button" data-testid={ `wrong-answer-${0}` }>Erro1</button>
+        </section>
       </>
     );
   }

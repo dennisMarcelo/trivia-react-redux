@@ -2,7 +2,9 @@ import { SET_USER } from '../action/index';
 
 const initialState = {
   name: '',
-  image: '',
+  assertions: '',
+  score: 0,
+  gravatarEmail: '',
 };
 
 const userReducer = (state = initialState, action) => {
@@ -11,7 +13,7 @@ const userReducer = (state = initialState, action) => {
     return {
       ...state,
       name: action.payload.name,
-      image: action.payload.image,
+      gravatarEmail: action.payload.gravatarEmail,
     };
 
   default:
