@@ -2,7 +2,7 @@ import { SET_USER } from '../action/index';
 
 const initialState = {
   name: '',
-  email: '',
+  image: '',
 };
 
 const userReducer = (state = initialState, action) => {
@@ -11,7 +11,7 @@ const userReducer = (state = initialState, action) => {
     return {
       ...state,
       name: action.payload.name,
-      email: action.payload.email,
+      image: action.payload.image,
     };
 
   default:

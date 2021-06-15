@@ -1,8 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import md5 from 'crypto-js/md5';
 import logo from '../trivia.png';
 import setUserAction from '../Redux/action/setUserAction';
+import fetchToken from '../helpers/fetchs';
+import { saveToken } from '../helpers/store';
 
 class Login extends React.Component {
   constructor() {
@@ -31,7 +34,7 @@ class Login extends React.Component {
   }
 
   mailAndNameValidation() {
-    const nameMin = 6;
+    const nameMin = 3;
     const { email, name } = this.state;
     this.setState({
       isValidMail: email.match(/[a-z]+@[a-z]+.com/g),
@@ -39,15 +42,23 @@ class Login extends React.Component {
     });
   }
 
-  handleClick() {
-    // Salvar Token no LocalStorage
-    // Enviar os dados do usuario para o state do Redux
-    // Fazer requisicao a API
+  async handleClick() {
+    const { setUser, history } = this.props;
+    const { name, email } = this.state;
+    const image = `https://www.gravatar.com/avatar/${md5(email).toString()}`;
+
+    setUser(name, image);
+    console.log(typeof history);
+
+    const token = await fetchToken();
+    saveToken(token);
+
+    history.push('/gameplayer');
   }
 
   render() {
-    const { isValidMail, isValidName, name, email } = this.state;
-    const { setUser } = this.props;
+    const { isValidMail, isValidName } = this.state;
+
     return (
       <section>
         <header className="App-header">
@@ -78,7 +89,7 @@ class Login extends React.Component {
           type="button"
           data-testid="btn-play"
           disabled={ !(isValidMail && isValidName) }
-          onClick={ () => setUser(name, email) }
+          onClick={ () => this.handleClick() }
         >
           Jogar
         </button>
@@ -92,7 +103,11 @@ Login.propTypes = {
 };
 
 const mapDispatchToProps = (dispatch) => ({
-  setUser: (name, email) => dispatch(setUserAction(name, email)),
+  setUser: (name, image) => dispatch(setUserAction(name, image)),
 });
+
+Login.propTypes = {
+  history: PropTypes.shape(Object).isRequired,
+};
 
 export default connect(null, mapDispatchToProps)(Login);
