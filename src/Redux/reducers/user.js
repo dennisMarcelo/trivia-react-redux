@@ -1,4 +1,4 @@
-import { SET_USER } from '../action/index';
+import { SET_USER, ADD_ASSERTION } from '../action/index';
 
 const initialState = {
   name: '',
@@ -15,7 +15,11 @@ const userReducer = (state = initialState, action) => {
       name: action.payload.name,
       gravatarEmail: action.payload.gravatarEmail,
     };
-
+  case ADD_ASSERTION:
+    return {
+      ...state,
+      assertions: state.assertions + action.amount,
+    };
   default:
     return state;
   }
