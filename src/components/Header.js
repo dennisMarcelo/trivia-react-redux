@@ -6,11 +6,11 @@ class Header extends React.Component {
   render() {
     const { img, name, score } = this.props;
     return (
-      <section>
+      <header>
         <img src={ img } alt="Token" data-testid="header-profile-picture" />
         <p data-testid="header-player-name">{ name }</p>
         <p data-testid="header-score">{ score }</p>
-      </section>
+      </header>
     );
   }
 }
