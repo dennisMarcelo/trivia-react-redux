@@ -75,13 +75,16 @@ class GamePlayer extends React.Component {
                       {answer}
                     </button>))}
               </section>
-              <button
-                type="button"
-                data-testid="btn-next"
-                onClick={ this.handleNextClick }
-              >
-                Next
-              </button>
+              {question > 0
+              && (
+                <button
+                  type="button"
+                  data-testid="btn-next"
+                  onClick={ this.handleNextClick }
+                >
+                  Next
+                </button>
+              )}
             </div>)}
       </>
     );
