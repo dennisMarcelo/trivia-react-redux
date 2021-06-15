@@ -22,7 +22,7 @@ const mapStateToProps = (state) => ({
 });
 
 Header.propTypes = {
-  img: PropTypes.shape(Object).isRequired,
+  img: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   score: PropTypes.number.isRequired,
 };
