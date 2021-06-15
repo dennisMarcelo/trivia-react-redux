@@ -2,7 +2,7 @@ import { SET_USER } from '../action/index';
 
 const initialState = {
   name: '',
-  assertions: '',
+  assertions: 0,
   score: 0,
   gravatarEmail: '',
 };
