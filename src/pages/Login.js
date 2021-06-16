@@ -48,7 +48,6 @@ class Login extends React.Component {
     const gravatarEmail = `https://www.gravatar.com/avatar/${md5(email).toString()}`;
 
     setUser(name, gravatarEmail);
-    console.log(typeof history);
 
     const token = await fetchToken();
     saveToken(token);
