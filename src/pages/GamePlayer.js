@@ -22,6 +22,7 @@ class GamePlayer extends React.Component {
     this.state = {
       question: 0,
       results: [],
+      buttonCLick: false,
     };
 
     this.fetchQuestions = this.fetchQuestions.bind(this);
@@ -29,6 +30,7 @@ class GamePlayer extends React.Component {
     this.handleAnswersRender = this.handleAnswersRender.bind(this);
     this.handleCorrectClick = this.handleCorrectClick.bind(this);
     this.handleIncorrectClick = this.handleIncorrectClick.bind(this);
+    this.renderButtonNext = this.renderButtonNext.bind(this);
   }
 
   componentDidMount() {
@@ -49,6 +51,7 @@ class GamePlayer extends React.Component {
     if (question < results.length - 1) {
       this.setState((prevState) => ({
         question: prevState.question + 1,
+        buttonCLick: false,
       }));
     } else {
       history.push('/feedback');
@@ -56,6 +59,7 @@ class GamePlayer extends React.Component {
   }
 
   handleCorrectClick() {
+    this.setState({ buttonCLick: true });
     const { handleCorretAnswer } = this.props;
     handleCorretAnswer();
     const { results, question } = this.state;
@@ -91,6 +95,7 @@ class GamePlayer extends React.Component {
   }
 
   handleIncorrectClick() {
+    this.setState({ buttonCLick: true });
     const { results, question } = this.state;
     const getCorrect = document.querySelector('#correct');
     const getIncorrects = results[question].incorrect_answers.length === 1
@@ -108,8 +113,9 @@ class GamePlayer extends React.Component {
       getIncorrects.style.backgroundColor = INCORRECT_ANSWER_BACKGROUND;
     }
     setTimeout(() => {
+      console.log('oi');
       getCorrect.style.border = ORIGINAL_BORDER_COLOR;
-      getCorrect.style.backgroundColor = ORIGINAL_BORDER_COLOR;
+      getCorrect.style.backgroundColor = ORIGINAL_BACKGROUND_COLOR;
       if (results[question].type === 'multiple') {
         getIncorrects.forEach((el) => {
           el.style.border = ORIGINAL_BORDER_COLOR;
@@ -153,8 +159,20 @@ class GamePlayer extends React.Component {
     );
   }
 
+  renderButtonNext() {
+    return (
+      <button
+        type="button"
+        data-testid="btn-next"
+        onClick={ this.handleNextClick }
+      >
+        Next
+      </button>
+    );
+  }
+
   render() {
-    const { results, question } = this.state;
+    const { results, question, buttonCLick } = this.state;
     return (
       <>
         <Header />
@@ -164,16 +182,7 @@ class GamePlayer extends React.Component {
               <h2 data-testid="question-category">{results[question].category}</h2>
               <p data-testid="question-text">{results[question].question}</p>
               {this.handleAnswersRender()}
-              {question > 0
-              && (
-                <button
-                  type="button"
-                  data-testid="btn-next"
-                  onClick={ this.handleNextClick }
-                >
-                  Next
-                </button>
-              )}
+              {buttonCLick && this.renderButtonNext() }
             </div>)}
       </>
     );
