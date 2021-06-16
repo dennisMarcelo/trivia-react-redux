@@ -15,11 +15,14 @@ const userReducer = (state = initialState, action) => {
       name: action.payload.name,
       gravatarEmail: action.payload.gravatarEmail,
     };
+
   case ADD_ASSERTION:
     return {
       ...state,
-      assertions: state.assertions + action.amount,
+      assertions: state.assertions + action.payload.assertions,
+      score: state.score + action.payload.score,
     };
+
   default:
     return state;
   }
