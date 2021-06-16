@@ -1,13 +1,13 @@
 import React from 'react';
 
-class Feedback extends React.Component {
+class Ranking extends React.Component {
   render() {
     return (
       <section>
-        <p>Feedback</p>
+        <h1 data-testid="ranking-title">Ranking</h1>
       </section>
     );
   }
 }
 
-export default Feedback;
+export default Ranking;
