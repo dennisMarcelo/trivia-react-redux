@@ -6,6 +6,8 @@ import { fetchQuestions } from '../helpers/fetchs';
 import { getToken } from '../helpers/store';
 import actionAddAssertion from '../Redux/action/actionAddAssertion';
 
+const ZERO_POINT_FIVE = 0.5;
+
 class GamePlayer extends React.Component {
   constructor() {
     super();
@@ -54,16 +56,6 @@ class GamePlayer extends React.Component {
               <h2 data-testid="question-category">{results[question].category}</h2>
               <p data-testid="question-text">{results[question].question}</p>
               <section>
-                <button
-                  type="button"
-                  data-testid="correct-answer"
-                  onClick={ () => {
-                    handleCorretAnswer();
-                    this.handleNextClick();
-                  } }
-                >
-                  {results[question].correct_answer}
-                </button>
                 {results[question].incorrect_answers
                   .map((answer, index) => (
                     <button
@@ -73,7 +65,19 @@ class GamePlayer extends React.Component {
                       onClick={ this.handleNextClick }
                     >
                       {answer}
-                    </button>))}
+                    </button>))
+                  .concat((
+                    <button
+                      type="button"
+                      data-testid="correct-answer"
+                      onClick={ () => {
+                        handleCorretAnswer();
+                        this.handleNextClick();
+                      } }
+                    >
+                      {results[question].correct_answer}
+                    </button>
+                  )).sort(() => Math.random() - ZERO_POINT_FIVE)}
               </section>
               {question > 0
               && (
