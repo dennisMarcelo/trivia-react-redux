@@ -6,6 +6,7 @@ import logo from '../trivia.png';
 import setUserAction from '../Redux/action/setUserAction';
 import { fetchToken } from '../helpers/fetchs';
 import { saveToken } from '../helpers/store';
+import reloadAction from '../Redux/action/reloadAction';
 
 class Login extends React.Component {
   constructor() {
@@ -19,6 +20,11 @@ class Login extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.mailAndNameValidation = this.mailAndNameValidation.bind(this);
     this.handleClick = this.handleClick.bind(this);
+  }
+
+  componentDidMount() {
+    const { clearUser } = this.props;
+    clearUser();
   }
 
   componentDidUpdate(_, prevState) {
@@ -107,11 +113,13 @@ class Login extends React.Component {
 
 const mapDispatchToProps = (dispatch) => ({
   setUser: (name, gravatarEmail) => dispatch(setUserAction(name, gravatarEmail)),
+  clearUser: () => dispatch(reloadAction()),
 });
 
 Login.propTypes = {
   history: PropTypes.shape(Object).isRequired,
   setUser: PropTypes.func.isRequired,
+  clearUser: PropTypes.func.isRequired,
 };
 
 export default connect(null, mapDispatchToProps)(Login);
