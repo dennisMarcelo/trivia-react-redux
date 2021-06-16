@@ -1,7 +1,10 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import Header from '../components/Header';
 import { fetchQuestions } from '../helpers/fetchs';
 import { getToken } from '../helpers/store';
+import actionAddAssertion from '../Redux/action/actionAddAssertion';
 
 class GamePlayer extends React.Component {
   constructor() {
@@ -9,8 +12,8 @@ class GamePlayer extends React.Component {
     this.state = {
       question: 0,
       results: [],
-      // loading: true,
     };
+
     this.fetchQuestions = this.fetchQuestions.bind(this);
     this.handleNextClick = this.handleNextClick.bind(this);
   }
@@ -27,14 +30,21 @@ class GamePlayer extends React.Component {
   }
 
   handleNextClick() {
-    const { results } = this.state;
-    this.setState((prevState) => ({
-      question: prevState.question < results.length - 1 ? prevState.question + 1 : 0 }));
+    const { results, question } = this.state;
+    const { history } = this.props;
+
+    if (question < results.length - 1) {
+      this.setState((prevState) => ({
+        question: prevState.question + 1,
+      }));
+    } else {
+      history.push('/feedback');
+    }
   }
 
   render() {
     const { results, question } = this.state;
-
+    const { handleCorretAnswer } = this.props;
     return (
       <>
         <Header />
@@ -47,6 +57,10 @@ class GamePlayer extends React.Component {
                 <button
                   type="button"
                   data-testid="correct-answer"
+                  onClick={ () => {
+                    handleCorretAnswer();
+                    this.handleNextClick();
+                  } }
                 >
                   {results[question].correct_answer}
                 </button>
@@ -56,15 +70,34 @@ class GamePlayer extends React.Component {
                       key={ index }
                       type="button"
                       data-testid={ `wrong-answer-${index}` }
+                      onClick={ this.handleNextClick }
                     >
                       {answer}
                     </button>))}
               </section>
-              <button type="button" onClick={ this.handleNextClick }>Next</button>
+              {question > 0
+              && (
+                <button
+                  type="button"
+                  data-testid="btn-next"
+                  onClick={ this.handleNextClick }
+                >
+                  Next
+                </button>
+              )}
             </div>)}
       </>
     );
   }
 }
 
-export default GamePlayer;
+const mapDispatchToProps = (dispatch) => ({
+  handleCorretAnswer: () => dispatch(actionAddAssertion()),
+});
+
+GamePlayer.propTypes = {
+  history: PropTypes.shape(Object).isRequired,
+  handleCorretAnswer: PropTypes.func.isRequired,
+};
+
+export default connect(null, mapDispatchToProps)(GamePlayer);
