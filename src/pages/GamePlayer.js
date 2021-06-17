@@ -12,7 +12,7 @@ import {
 
 const ZERO_POINT_FIVE = 0.5;
 const ONE_SECOND = 1000;
-const TIMER = 5; // era 30
+const TIMER = 30;
 
 class GamePlayer extends React.Component {
   constructor() {
@@ -21,7 +21,7 @@ class GamePlayer extends React.Component {
       question: 0,
       results: [],
       buttonCLick: false,
-      timer: 5, // era 30
+      timer: 30,
       incorrect: '',
       correct: '',
       isDisabled: false,
