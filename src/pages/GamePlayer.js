@@ -154,7 +154,7 @@ class GamePlayer extends React.Component {
       <aside>
         {results[question].sorted
           .map((answer, index) => (
-            answer === results[question].incorrect_answers
+            answer !== results[question].correct_answer
               ? (
                 <button
                   className="incorrect"

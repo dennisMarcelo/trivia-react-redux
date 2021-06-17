@@ -37,7 +37,7 @@ const userReducer = (state = initialState, action) => {
   case ADD_SCORE_MEDIUM:
     return {
       ...state,
-      score: state.score + action.payload.medim,
+      score: state.score + action.payload.medium,
     };
 
   case ADD_SCORE_EASY:
