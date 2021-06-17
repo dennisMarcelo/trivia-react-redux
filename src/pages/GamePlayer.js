@@ -13,7 +13,6 @@ import {
 const ZERO_POINT_FIVE = 0.5;
 const ONE_SECOND = 1000;
 const TIMER = 5; // era 30
-const THIRTY_SECONDS = 30000;
 
 class GamePlayer extends React.Component {
   constructor() {
@@ -34,6 +33,7 @@ class GamePlayer extends React.Component {
     this.handleCorrectClick = this.handleCorrectClick.bind(this);
     this.handleIncorrectClick = this.handleIncorrectClick.bind(this);
     this.renderButtonNext = this.renderButtonNext.bind(this);
+    this.mariana = this.mariana.bind(this);
   }
 
   componentDidMount() {
@@ -42,27 +42,31 @@ class GamePlayer extends React.Component {
 
   setTimerState() {
     const interval = setInterval(() => {
-      const { results, question } = this.state;
-      if (question < results.length - 1) {
-        this.setState((prevState) => ({
-          timer: prevState.timer > 0 ? prevState.timer - 1 : TIMER,
-        }));
-      } else {
-        clearInterval(interval);
-      }
-    }, ONE_SECOND);
-    const interval2 = setInterval(() => {
-      const { results, question } = this.state;
-      const { history } = this.props;
-      if (question < results.length - 1) {
+      const { results, question, timer } = this.state;
+      console.log(timer);
+      this.setState((prevState) => ({
+        timer: prevState.timer > 0 ? prevState.timer - 1 : TIMER,
+      }));
+
+      if (question < results.length - 1 || timer > 1) {
         this.setState((prevState) => ({
           question: prevState.timer === 0 ? prevState.question + 1 : prevState.question,
         }));
       } else {
-        clearInterval(interval2);
-        history.push('/feedback');
+        clearInterval(interval);
+        this.mariana();
       }
-    }, THIRTY_SECONDS);
+    }, ONE_SECOND);
+  }
+
+  mariana() {
+    this.setState({
+      buttonCLick: true,
+      incorrect: 'incorrect',
+      correct: 'correct',
+      timer: 0,
+      isDisabled: true,
+    });
   }
 
   async fetchQuestions() {
