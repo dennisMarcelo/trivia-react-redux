@@ -12,7 +12,8 @@ import {
 
 const ZERO_POINT_FIVE = 0.5;
 const ONE_SECOND = 1000;
-const TIMER = 30;
+const TIMER = 5; // era 30
+const THIRTY_SECONDS = 30000;
 
 class GamePlayer extends React.Component {
   constructor() {
@@ -21,7 +22,7 @@ class GamePlayer extends React.Component {
       question: 0,
       results: [],
       buttonCLick: false,
-      timer: 30,
+      timer: 5, // era 30
       incorrect: '',
       correct: '',
       isDisabled: false,
@@ -40,19 +41,28 @@ class GamePlayer extends React.Component {
   }
 
   setTimerState() {
-    setInterval(() => {
+    const interval = setInterval(() => {
+      const { results, question } = this.state;
+      if (question < results.length - 1) {
+        this.setState((prevState) => ({
+          timer: prevState.timer > 0 ? prevState.timer - 1 : TIMER,
+        }));
+      } else {
+        clearInterval(interval);
+      }
+    }, ONE_SECOND);
+    const interval2 = setInterval(() => {
       const { results, question } = this.state;
       const { history } = this.props;
       if (question < results.length - 1) {
         this.setState((prevState) => ({
           question: prevState.timer === 0 ? prevState.question + 1 : prevState.question,
-          timer: prevState.timer > 0 ? prevState.timer - 1 : TIMER,
         }));
       } else {
-        clearInterval(this.setTimerState());
+        clearInterval(interval2);
         history.push('/feedback');
       }
-    }, ONE_SECOND);
+    }, THIRTY_SECONDS);
   }
 
   async fetchQuestions() {
