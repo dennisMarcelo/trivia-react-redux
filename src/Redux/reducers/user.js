@@ -1,4 +1,10 @@
-import { SET_USER, ADD_ASSERTION, RELOAD } from '../action/index';
+import {
+  SET_USER,
+  ADD_ASSERTION,
+  RELOAD,
+  ADD_SCORE_HARD,
+  ADD_SCORE_MEDIUM,
+  ADD_SCORE_EASY } from '../action/index';
 
 const initialState = {
   name: '',
@@ -20,7 +26,24 @@ const userReducer = (state = initialState, action) => {
     return {
       ...state,
       assertions: state.assertions + action.payload.assertions,
-      score: state.score + action.payload.score,
+    };
+
+  case ADD_SCORE_HARD:
+    return {
+      ...state,
+      score: state.score + action.payload.hard,
+    };
+
+  case ADD_SCORE_MEDIUM:
+    return {
+      ...state,
+      score: state.score + action.payload.medim,
+    };
+
+  case ADD_SCORE_EASY:
+    return {
+      ...state,
+      score: state.score + action.payload.easy,
     };
 
   case RELOAD:

@@ -4,7 +4,6 @@ const actionAddAssertion = () => ({
   type: ADD_ASSERTION,
   payload: {
     assertions: 1,
-    score: 10,
   },
 });
 

@@ -5,9 +5,15 @@ import Header from '../components/Header';
 import { fetchQuestions } from '../helpers/fetchs';
 import { getToken } from '../helpers/store';
 import actionAddAssertion from '../Redux/action/actionAddAssertion';
+import {
+  actionScoreHard,
+  actionScoreMedium,
+  actionScoreEasy } from '../Redux/action/actionScore';
 
 const ZERO_POINT_FIVE = 0.5;
+const ONE_SECOND = 1000;
 const FIVE_SECONDS = 5000;
+const TIMER = 30;
 const CORRECT_ANSWER_BORDER = '3px solid rgb(6, 240, 15)';
 const INCORRECT_ANSWER_BORDER = '3px solid rgb(255, 0, 0)';
 const CORRECT_ANSWER_BACKGROUND = 'rgb(6, 240, 15)';
@@ -23,31 +29,46 @@ class GamePlayer extends React.Component {
       question: 0,
       results: [],
       buttonCLick: false,
+      timer: 30,
     };
 
     this.fetchQuestions = this.fetchQuestions.bind(this);
-    this.handleNextClick = this.handleNextClick.bind(this);
+    this.handleNextQuestion = this.handleNextQuestion.bind(this);
     this.handleAnswersRender = this.handleAnswersRender.bind(this);
     this.handleCorrectClick = this.handleCorrectClick.bind(this);
     this.handleIncorrectClick = this.handleIncorrectClick.bind(this);
     this.renderButtonNext = this.renderButtonNext.bind(this);
+    this.setTimerState = this.setTimerState.bind(this);
   }
 
   componentDidMount() {
     this.fetchQuestions();
+    this.setTimerState();
+  }
+
+  setTimerState() {
+    setInterval(() => {
+      this.setState((prevState) => ({
+        timer: prevState.timer > 0 ? prevState.timer - 1 : TIMER,
+        question: prevState.timer === 0 ? prevState.question + 1 : prevState.question,
+      }));
+    }, ONE_SECOND);
   }
 
   async fetchQuestions() {
     const token = getToken();
     const { results } = await fetchQuestions(token);
+    results.forEach((el) => {
+      el.sorted = el.incorrect_answers.concat(el.correct_answer)
+        .sort(() => Math.random() - ZERO_POINT_FIVE);
+    });
     this.setState({ results });
     console.log(results);
   }
 
-  handleNextClick() {
+  handleNextQuestion() {
     const { results, question } = this.state;
     const { history } = this.props;
-
     if (question < results.length - 1) {
       this.setState((prevState) => ({
         question: prevState.question + 1,
@@ -58,10 +79,7 @@ class GamePlayer extends React.Component {
     }
   }
 
-  handleCorrectClick() {
-    this.setState({ buttonCLick: true });
-    const { handleCorretAnswer } = this.props;
-    handleCorretAnswer();
+  showAnswers() {
     const { results, question } = this.state;
     const getCorrect = document.querySelector('#correct');
     const getIncorrects = results[question].incorrect_answers.length === 1
@@ -78,54 +96,55 @@ class GamePlayer extends React.Component {
       getIncorrects.style.border = INCORRECT_ANSWER_BORDER;
       getIncorrects.style.backgroundColor = INCORRECT_ANSWER_BACKGROUND;
     }
+  }
+
+  resetAnswsers() {
+    const { results, question } = this.state;
+    const getCorrect = document.querySelector('#correct');
+    const getIncorrects = results[question].incorrect_answers.length === 1
+      ? document.querySelector(INCORRECT)
+      : document.querySelectorAll(INCORRECT);
+    getCorrect.style.border = ORIGINAL_BORDER_COLOR;
+    getCorrect.style.backgroundColor = ORIGINAL_BACKGROUND_COLOR;
+    if (results[question].type === 'multiple') {
+      getIncorrects.forEach((el) => {
+        el.style.border = ORIGINAL_BORDER_COLOR;
+        el.style.backgroundColor = ORIGINAL_BACKGROUND_COLOR;
+      });
+    } else if (results[question].type === 'boolean') {
+      getIncorrects.style.border = ORIGINAL_BORDER_COLOR;
+      getIncorrects.style.backgroundColor = ORIGINAL_BACKGROUND_COLOR;
+    }
+  }
+
+  handleCorrectClick() {
+    const { results, question, timer } = this.state;
+    this.setState({ buttonCLick: true });
+    const {
+      handleCorretAnswer,
+      handleHardScore,
+      handleMediumScore,
+      handleEasyScore } = this.props;
+    if (results[question].difficulty === 'hard') { handleHardScore(timer); }
+    if (results[question].difficulty === 'medium') { handleMediumScore(timer); }
+    if (results[question].difficulty === 'easy') { handleEasyScore(timer); }
+    handleCorretAnswer();
+    this.showAnswers();
     setTimeout(() => {
-      getCorrect.style.border = ORIGINAL_BORDER_COLOR;
-      getCorrect.style.backgroundColor = ORIGINAL_BACKGROUND_COLOR;
-      if (results[question].type === 'multiple') {
-        getIncorrects.forEach((el) => {
-          el.style.border = ORIGINAL_BORDER_COLOR;
-          el.style.backgroundColor = ORIGINAL_BACKGROUND_COLOR;
-        });
-      } else if (results[question].type === 'boolean') {
-        getIncorrects.style.border = ORIGINAL_BORDER_COLOR;
-        getIncorrects.style.backgroundColor = ORIGINAL_BACKGROUND_COLOR;
-      }
-      this.handleNextClick();
+      this.resetAnswsers();
+      this.handleNextQuestion();
+      this.setState({ timer: 30 });
     }, FIVE_SECONDS);
   }
 
   handleIncorrectClick() {
     this.setState({ buttonCLick: true });
-    const { results, question } = this.state;
-    const getCorrect = document.querySelector('#correct');
-    const getIncorrects = results[question].incorrect_answers.length === 1
-      ? document.querySelector(INCORRECT)
-      : document.querySelectorAll(INCORRECT);
-    getCorrect.style.border = CORRECT_ANSWER_BORDER;
-    getCorrect.style.backgroundColor = CORRECT_ANSWER_BACKGROUND;
-    if (results[question].type === 'multiple') {
-      getIncorrects.forEach((el) => {
-        el.style.border = INCORRECT_ANSWER_BORDER;
-        el.style.backgroundColor = INCORRECT_ANSWER_BACKGROUND;
-      });
-    } else if (results[question].type === 'boolean') {
-      getIncorrects.style.border = INCORRECT_ANSWER_BORDER;
-      getIncorrects.style.backgroundColor = INCORRECT_ANSWER_BACKGROUND;
-    }
+    this.showAnswers();
     setTimeout(() => {
       console.log('oi');
-      getCorrect.style.border = ORIGINAL_BORDER_COLOR;
-      getCorrect.style.backgroundColor = ORIGINAL_BACKGROUND_COLOR;
-      if (results[question].type === 'multiple') {
-        getIncorrects.forEach((el) => {
-          el.style.border = ORIGINAL_BORDER_COLOR;
-          el.style.backgroundColor = ORIGINAL_BACKGROUND_COLOR;
-        });
-      } else if (results[question].type === 'boolean') {
-        getIncorrects.style.border = ORIGINAL_BORDER_COLOR;
-        getIncorrects.style.backgroundColor = ORIGINAL_BACKGROUND_COLOR;
-      }
-      this.handleNextClick();
+      this.resetAnswsers();
+      this.handleNextQuestion();
+      this.setState({ timer: 30 });
     }, FIVE_SECONDS);
   }
 
@@ -133,30 +152,31 @@ class GamePlayer extends React.Component {
     const { results, question } = this.state;
     return (
       <aside>
-        {results[question].incorrect_answers
+        {results[question].sorted
           .map((answer, index) => (
-            <button
-              className="incorrect"
-              key={ index }
-              type="button"
-              data-testid={ `wrong-answer-${index}` }
-              onClick={ this.handleIncorrectClick }
-            >
-              {answer}
-            </button>))
-          .concat((
-            <button
-              key="correct"
-              id="correct"
-              type="button"
-              data-testid="correct-answer"
-              onClick={ this.handleCorrectClick }
-            >
-              {results[question].correct_answer}
-            </button>
-          )).sort(() => Math.random() - ZERO_POINT_FIVE)}
-      </aside>
-    );
+            answer === results[question].incorrect_answers
+              ? (
+                <button
+                  className="incorrect"
+                  key={ index }
+                  type="button"
+                  data-testid={ `wrong-answer-${index}` }
+                  onClick={ this.handleIncorrectClick }
+                >
+                  {answer}
+                </button>)
+              : (
+                <button
+                  key="correct"
+                  id="correct"
+                  type="button"
+                  data-testid="correct-answer"
+                  onClick={ this.handleCorrectClick }
+                >
+                  {answer}
+                </button>)
+          ))}
+      </aside>);
   }
 
   renderButtonNext() {
@@ -164,7 +184,7 @@ class GamePlayer extends React.Component {
       <button
         type="button"
         data-testid="btn-next"
-        onClick={ this.handleNextClick }
+        onClick={ this.handleNextQuestion }
       >
         Next
       </button>
@@ -172,10 +192,11 @@ class GamePlayer extends React.Component {
   }
 
   render() {
-    const { results, question, buttonCLick } = this.state;
+    const { results, question, buttonCLick, timer } = this.state;
     return (
       <>
         <Header />
+        <p>{timer}</p>
         {results.length > 0
           && (
             <div>
@@ -191,11 +212,17 @@ class GamePlayer extends React.Component {
 
 const mapDispatchToProps = (dispatch) => ({
   handleCorretAnswer: () => dispatch(actionAddAssertion()),
+  handleHardScore: (time) => dispatch(actionScoreHard(time)),
+  handleMediumScore: (time) => dispatch(actionScoreMedium(time)),
+  handleEasyScore: (time) => dispatch(actionScoreEasy(time)),
 });
 
 GamePlayer.propTypes = {
   history: PropTypes.shape(Object).isRequired,
   handleCorretAnswer: PropTypes.func.isRequired,
+  handleHardScore: PropTypes.func.isRequired,
+  handleMediumScore: PropTypes.func.isRequired,
+  handleEasyScore: PropTypes.func.isRequired,
 };
 
 export default connect(null, mapDispatchToProps)(GamePlayer);
