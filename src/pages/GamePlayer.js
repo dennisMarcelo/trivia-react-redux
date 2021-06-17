@@ -12,15 +12,7 @@ import {
 
 const ZERO_POINT_FIVE = 0.5;
 const ONE_SECOND = 1000;
-const FIVE_SECONDS = 5000;
 const TIMER = 30;
-const CORRECT_ANSWER_BORDER = '3px solid rgb(6, 240, 15)';
-const INCORRECT_ANSWER_BORDER = '3px solid rgb(255, 0, 0)';
-const CORRECT_ANSWER_BACKGROUND = 'rgb(6, 240, 15)';
-const INCORRECT_ANSWER_BACKGROUND = 'rgb(255, 0, 0)';
-const ORIGINAL_BORDER_COLOR = '3px solid rgb(239, 239, 239)';
-const ORIGINAL_BACKGROUND_COLOR = 'rgb(239, 239, 239)';
-const INCORRECT = '.incorrect';
 
 class GamePlayer extends React.Component {
   constructor() {
@@ -30,6 +22,9 @@ class GamePlayer extends React.Component {
       results: [],
       buttonCLick: false,
       timer: 30,
+      incorrect: '',
+      correct: '',
+      isDisabled: false,
     };
 
     this.fetchQuestions = this.fetchQuestions.bind(this);
@@ -38,20 +33,25 @@ class GamePlayer extends React.Component {
     this.handleCorrectClick = this.handleCorrectClick.bind(this);
     this.handleIncorrectClick = this.handleIncorrectClick.bind(this);
     this.renderButtonNext = this.renderButtonNext.bind(this);
-    this.setTimerState = this.setTimerState.bind(this);
   }
 
   componentDidMount() {
-    this.fetchQuestions();
-    this.setTimerState();
+    this.fetchQuestions().then(() => this.setTimerState());
   }
 
   setTimerState() {
     setInterval(() => {
-      this.setState((prevState) => ({
-        timer: prevState.timer > 0 ? prevState.timer - 1 : TIMER,
-        question: prevState.timer === 0 ? prevState.question + 1 : prevState.question,
-      }));
+      const { results, question } = this.state;
+      const { history } = this.props;
+      if (question < results.length - 1) {
+        this.setState((prevState) => ({
+          question: prevState.timer === 0 ? prevState.question + 1 : prevState.question,
+          timer: prevState.timer > 0 ? prevState.timer - 1 : TIMER,
+        }));
+      } else {
+        clearInterval(this.setTimerState());
+        history.push('/feedback');
+      }
     }, ONE_SECOND);
   }
 
@@ -73,53 +73,24 @@ class GamePlayer extends React.Component {
       this.setState((prevState) => ({
         question: prevState.question + 1,
         buttonCLick: false,
+        incorrect: '',
+        correct: '',
+        isDisabled: false,
+        timer: 30,
       }));
     } else {
       history.push('/feedback');
     }
   }
 
-  showAnswers() {
-    const { results, question } = this.state;
-    const getCorrect = document.querySelector('#correct');
-    const getIncorrects = results[question].incorrect_answers.length === 1
-      ? document.querySelector(INCORRECT)
-      : document.querySelectorAll(INCORRECT);
-    getCorrect.style.border = CORRECT_ANSWER_BORDER;
-    getCorrect.style.backgroundColor = CORRECT_ANSWER_BACKGROUND;
-    if (results[question].type === 'multiple') {
-      getIncorrects.forEach((el) => {
-        el.style.border = INCORRECT_ANSWER_BORDER;
-        el.style.backgroundColor = INCORRECT_ANSWER_BACKGROUND;
-      });
-    } else if (results[question].type === 'boolean') {
-      getIncorrects.style.border = INCORRECT_ANSWER_BORDER;
-      getIncorrects.style.backgroundColor = INCORRECT_ANSWER_BACKGROUND;
-    }
-  }
-
-  resetAnswsers() {
-    const { results, question } = this.state;
-    const getCorrect = document.querySelector('#correct');
-    const getIncorrects = results[question].incorrect_answers.length === 1
-      ? document.querySelector(INCORRECT)
-      : document.querySelectorAll(INCORRECT);
-    getCorrect.style.border = ORIGINAL_BORDER_COLOR;
-    getCorrect.style.backgroundColor = ORIGINAL_BACKGROUND_COLOR;
-    if (results[question].type === 'multiple') {
-      getIncorrects.forEach((el) => {
-        el.style.border = ORIGINAL_BORDER_COLOR;
-        el.style.backgroundColor = ORIGINAL_BACKGROUND_COLOR;
-      });
-    } else if (results[question].type === 'boolean') {
-      getIncorrects.style.border = ORIGINAL_BORDER_COLOR;
-      getIncorrects.style.backgroundColor = ORIGINAL_BACKGROUND_COLOR;
-    }
-  }
-
   handleCorrectClick() {
     const { results, question, timer } = this.state;
-    this.setState({ buttonCLick: true });
+    this.setState({
+      buttonCLick: true,
+      incorrect: 'incorrect',
+      correct: 'correct',
+      isDisabled: true,
+    });
     const {
       handleCorretAnswer,
       handleHardScore,
@@ -129,27 +100,19 @@ class GamePlayer extends React.Component {
     if (results[question].difficulty === 'medium') { handleMediumScore(timer); }
     if (results[question].difficulty === 'easy') { handleEasyScore(timer); }
     handleCorretAnswer();
-    this.showAnswers();
-    setTimeout(() => {
-      this.resetAnswsers();
-      this.handleNextQuestion();
-      this.setState({ timer: 30 });
-    }, FIVE_SECONDS);
   }
 
   handleIncorrectClick() {
-    this.setState({ buttonCLick: true });
-    this.showAnswers();
-    setTimeout(() => {
-      console.log('oi');
-      this.resetAnswsers();
-      this.handleNextQuestion();
-      this.setState({ timer: 30 });
-    }, FIVE_SECONDS);
+    this.setState({
+      buttonCLick: true,
+      incorrect: 'incorrect',
+      correct: 'correct',
+      isDisabled: true,
+    });
   }
 
   handleAnswersRender() {
-    const { results, question } = this.state;
+    const { results, question, incorrect, correct, isDisabled } = this.state;
     return (
       <aside>
         {results[question].sorted
@@ -157,21 +120,23 @@ class GamePlayer extends React.Component {
             answer !== results[question].correct_answer
               ? (
                 <button
-                  className="incorrect"
+                  className={ incorrect }
                   key={ index }
                   type="button"
                   data-testid={ `wrong-answer-${index}` }
                   onClick={ this.handleIncorrectClick }
+                  disabled={ isDisabled }
                 >
                   {answer}
                 </button>)
               : (
                 <button
                   key="correct"
-                  id="correct"
+                  className={ correct }
                   type="button"
                   data-testid="correct-answer"
                   onClick={ this.handleCorrectClick }
+                  disabled={ isDisabled }
                 >
                   {answer}
                 </button>)
