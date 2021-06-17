@@ -44,13 +44,11 @@ class GamePlayer extends React.Component {
     const interval = setInterval(() => {
       const { results, question, timer } = this.state;
       console.log(timer);
-      this.setState((prevState) => ({
-        timer: prevState.timer > 0 ? prevState.timer - 1 : TIMER,
-      }));
 
       if (question < results.length - 1 || timer > 1) {
         this.setState((prevState) => ({
           question: prevState.timer === 0 ? prevState.question + 1 : prevState.question,
+          timer: prevState.timer > 0 ? prevState.timer - 1 : TIMER,
         }));
       } else {
         clearInterval(interval);
