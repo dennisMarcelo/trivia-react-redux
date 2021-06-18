@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Header from '../components/Header';
 import { fetchQuestions } from '../helpers/fetchs';
-import { getToken, savePlayer } from '../helpers/store';
+import { getToken, savePlayer, saveRanking } from '../helpers/store';
 import actionAddAssertion from '../Redux/action/actionAddAssertion';
 import actionScore from '../Redux/action/actionScore';
 
@@ -74,7 +74,8 @@ class GamePlayer extends React.Component {
 
   handleNextQuestion() {
     const { results, question } = this.state;
-    const { history } = this.props;
+    const { history, getReduxState: { player: {
+      name, gravatarEmail, score } } } = this.props;
     if (question < results.length - 1) {
       this.setState((prevState) => ({
         question: prevState.question + 1,
@@ -85,6 +86,7 @@ class GamePlayer extends React.Component {
         timer: 30,
       }));
     } else {
+      saveRanking({ name, score, picture: gravatarEmail });
       history.push('/feedback');
     }
   }
