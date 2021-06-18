@@ -13,5 +13,11 @@ export function savePlayer(player) {
 }
 
 export function saveRanking(player) {
-  localStorage.setItem('ranking', player);
+  if (localStorage.getItem('ranking')) {
+    const arrayRanking = JSON.parse(localStorage.getItem('ranking'));
+    arrayRanking.push(player);
+    localStorage.setItem('ranking', JSON.stringify(arrayRanking));
+  } else {
+    localStorage.setItem('ranking', JSON.stringify([player]));
+  }
 }
