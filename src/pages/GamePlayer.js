@@ -20,7 +20,7 @@ class GamePlayer extends React.Component {
       question: 0,
       results: [],
       buttonCLick: false,
-      timer: 5,
+      timer: 30,
       incorrect: '',
       correct: '',
       isDisabled: false,
