@@ -5,13 +5,13 @@ import Header from '../components/Header';
 import { fetchQuestions } from '../helpers/fetchs';
 import { getToken, savePlayer } from '../helpers/store';
 import actionAddAssertion from '../Redux/action/actionAddAssertion';
-import {
-  actionScoreHard,
-  actionScoreMedium,
-  actionScoreEasy } from '../Redux/action/actionScore';
+import actionScore from '../Redux/action/actionScore';
 
 const ZERO_POINT_FIVE = 0.5;
 const ONE_SECOND = 1000;
+const TEN = 10;
+const HARD = 3;
+const MEDIUM = 2;
 
 class GamePlayer extends React.Component {
   constructor() {
@@ -24,7 +24,6 @@ class GamePlayer extends React.Component {
       incorrect: '',
       correct: '',
       isDisabled: false,
-      assertions: 0,
     };
 
     this.fetchQuestions = this.fetchQuestions.bind(this);
@@ -38,14 +37,6 @@ class GamePlayer extends React.Component {
   componentDidMount() {
     this.fetchQuestions();
     this.setTimerState();
-  }
-
-  componentDidUpdate(_, prevState) {
-    const { assertions } = this.state;
-    if (prevState.assertions !== assertions) {
-      const { getReduxState } = this.props;
-      savePlayer(JSON.stringify(getReduxState));
-    }
   }
 
   setTimerState() {
@@ -100,25 +91,30 @@ class GamePlayer extends React.Component {
 
   handleCorrectClick() {
     const { results, question, timer } = this.state;
-    const {
-      handleCorretAnswer,
-      handleHardScore,
-      handleMediumScore,
-      handleEasyScore } = this.props;
-    if (results[question].difficulty === 'hard') { handleHardScore(timer); }
-    if (results[question].difficulty === 'medium') { handleMediumScore(timer); }
-    if (results[question].difficulty === 'easy') { handleEasyScore(timer); }
+    const { handleCorretAnswer, addScore } = this.props;
+
+    let calculo = 0;
+    if (results[question].difficulty === 'hard') {
+      calculo = TEN + timer * HARD;
+    }
+    if (results[question].difficulty === 'medium') {
+      calculo = TEN + timer * MEDIUM;
+    }
+    if (results[question].difficulty === 'easy') {
+      calculo = TEN + timer;
+    }
+    addScore(calculo);
+
     handleCorretAnswer();
-    // const { getReduxState } = this.props;
-    // console.log(getReduxState);
-    // savePlayer(JSON.stringify(getReduxState));
-    this.setState((prevState) => ({
+    const { getReduxState } = this.props;
+    getReduxState.player.score += calculo;
+    savePlayer(getReduxState);
+    this.setState({
       buttonCLick: true,
       incorrect: 'incorrect',
       correct: 'correct',
       isDisabled: true,
-      assertions: prevState.assertions + 1,
-    }));
+    });
   }
 
   handleIncorrectClick() {
@@ -200,18 +196,14 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   handleCorretAnswer: () => dispatch(actionAddAssertion()),
-  handleHardScore: (time) => dispatch(actionScoreHard(time)),
-  handleMediumScore: (time) => dispatch(actionScoreMedium(time)),
-  handleEasyScore: (time) => dispatch(actionScoreEasy(time)),
+  addScore: (score) => dispatch(actionScore(score)),
 });
 
 GamePlayer.propTypes = {
   history: PropTypes.shape(Object).isRequired,
   handleCorretAnswer: PropTypes.func.isRequired,
-  handleHardScore: PropTypes.func.isRequired,
-  handleMediumScore: PropTypes.func.isRequired,
-  handleEasyScore: PropTypes.func.isRequired,
   getReduxState: PropTypes.func.isRequired,
+  addScore: PropTypes.func.isRequired,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(GamePlayer);

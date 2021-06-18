@@ -7,8 +7,9 @@ export function getToken() {
 }
 
 export function savePlayer(player) {
-  console.log(JSON.parse(player).player.score);
-  localStorage.setItem('state', player);
+  console.log(player);
+
+  localStorage.setItem('state', JSON.stringify(player));
 }
 
 export function saveRanking(player) {
