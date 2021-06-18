@@ -5,7 +5,7 @@ import md5 from 'crypto-js/md5';
 import logo from '../trivia.png';
 import setUserAction from '../Redux/action/setUserAction';
 import { fetchToken } from '../helpers/fetchs';
-import { saveToken } from '../helpers/store';
+import { savePlayer, saveToken } from '../helpers/store';
 import reloadAction from '../Redux/action/reloadAction';
 
 class Login extends React.Component {
@@ -55,9 +55,15 @@ class Login extends React.Component {
 
     setUser(name, gravatarEmail);
 
+    savePlayer({ player: {
+      name,
+      assertions: 0,
+      score: 0,
+      gravatarEmail,
+    } });
+
     const token = await fetchToken();
     saveToken(token);
-
     history.push('/gameplayer');
   }
 

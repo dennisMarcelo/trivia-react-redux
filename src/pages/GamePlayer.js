@@ -3,18 +3,15 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Header from '../components/Header';
 import { fetchQuestions } from '../helpers/fetchs';
-import { getToken } from '../helpers/store';
+import { getToken, savePlayer } from '../helpers/store';
 import actionAddAssertion from '../Redux/action/actionAddAssertion';
+import actionScore from '../Redux/action/actionScore';
 
 const ZERO_POINT_FIVE = 0.5;
-const FIVE_SECONDS = 5000;
-const CORRECT_ANSWER_BORDER = '3px solid rgb(6, 240, 15)';
-const INCORRECT_ANSWER_BORDER = '3px solid rgb(255, 0, 0)';
-const CORRECT_ANSWER_BACKGROUND = 'rgb(6, 240, 15)';
-const INCORRECT_ANSWER_BACKGROUND = 'rgb(255, 0, 0)';
-const ORIGINAL_BORDER_COLOR = '3px solid rgb(239, 239, 239)';
-const ORIGINAL_BACKGROUND_COLOR = 'rgb(239, 239, 239)';
-const INCORRECT = '.incorrect';
+const ONE_SECOND = 1000;
+const TEN = 10;
+const HARD = 3;
+const MEDIUM = 2;
 
 class GamePlayer extends React.Component {
   constructor() {
@@ -23,10 +20,14 @@ class GamePlayer extends React.Component {
       question: 0,
       results: [],
       buttonCLick: false,
+      timer: 30,
+      incorrect: '',
+      correct: '',
+      isDisabled: false,
     };
 
     this.fetchQuestions = this.fetchQuestions.bind(this);
-    this.handleNextClick = this.handleNextClick.bind(this);
+    this.handleNextQuestion = this.handleNextQuestion.bind(this);
     this.handleAnswersRender = this.handleAnswersRender.bind(this);
     this.handleCorrectClick = this.handleCorrectClick.bind(this);
     this.handleIncorrectClick = this.handleIncorrectClick.bind(this);
@@ -35,23 +36,53 @@ class GamePlayer extends React.Component {
 
   componentDidMount() {
     this.fetchQuestions();
+    this.setTimerState();
+  }
+
+  setTimerState() {
+    const interval = setInterval(() => {
+      const { timer, isDisabled, question, results } = this.state;
+      if (timer > 0) {
+        this.setState((prevState) => ({
+          timer: prevState.timer > 0 ? prevState.timer - 1 : 0,
+        }));
+      } else if (timer === 0) {
+        this.setState((prevState) => ({
+          timer: prevState.timer > 0 ? prevState.timer - 1 : 0,
+          isDisabled: prevState.timer === 0,
+          buttonCLick: prevState.timer === 0 || isDisabled,
+          incorrect: 'incorrect',
+          correct: 'correct',
+        }));
+      }
+      if (question === results.length - 1 && timer === 0) {
+        clearInterval(interval);
+      }
+    }, ONE_SECOND);
   }
 
   async fetchQuestions() {
     const token = getToken();
     const { results } = await fetchQuestions(token);
+    results.forEach((el) => {
+      el.sorted = el.incorrect_answers.concat(el.correct_answer)
+        .sort(() => Math.random() - ZERO_POINT_FIVE);
+    });
     this.setState({ results });
     console.log(results);
   }
 
-  handleNextClick() {
+  handleNextQuestion() {
     const { results, question } = this.state;
     const { history } = this.props;
-
     if (question < results.length - 1) {
       this.setState((prevState) => ({
         question: prevState.question + 1,
         buttonCLick: false,
+        incorrect: '',
+        correct: '',
+        isDisabled: false,
+        timer: 30,
       }));
     } else {
       history.push('/feedback');
@@ -59,104 +90,73 @@ class GamePlayer extends React.Component {
   }
 
   handleCorrectClick() {
-    this.setState({ buttonCLick: true });
-    const { handleCorretAnswer } = this.props;
-    handleCorretAnswer();
-    const { results, question } = this.state;
-    const getCorrect = document.querySelector('#correct');
-    const getIncorrects = results[question].incorrect_answers.length === 1
-      ? document.querySelector(INCORRECT)
-      : document.querySelectorAll(INCORRECT);
-    getCorrect.style.border = CORRECT_ANSWER_BORDER;
-    getCorrect.style.backgroundColor = CORRECT_ANSWER_BACKGROUND;
-    if (results[question].type === 'multiple') {
-      getIncorrects.forEach((el) => {
-        el.style.border = INCORRECT_ANSWER_BORDER;
-        el.style.backgroundColor = INCORRECT_ANSWER_BACKGROUND;
-      });
-    } else if (results[question].type === 'boolean') {
-      getIncorrects.style.border = INCORRECT_ANSWER_BORDER;
-      getIncorrects.style.backgroundColor = INCORRECT_ANSWER_BACKGROUND;
+    const { results, question, timer } = this.state;
+    const { handleCorretAnswer, addScore } = this.props;
+
+    let calculo = 0;
+    if (results[question].difficulty === 'hard') {
+      calculo = TEN + timer * HARD;
     }
-    setTimeout(() => {
-      getCorrect.style.border = ORIGINAL_BORDER_COLOR;
-      getCorrect.style.backgroundColor = ORIGINAL_BACKGROUND_COLOR;
-      if (results[question].type === 'multiple') {
-        getIncorrects.forEach((el) => {
-          el.style.border = ORIGINAL_BORDER_COLOR;
-          el.style.backgroundColor = ORIGINAL_BACKGROUND_COLOR;
-        });
-      } else if (results[question].type === 'boolean') {
-        getIncorrects.style.border = ORIGINAL_BORDER_COLOR;
-        getIncorrects.style.backgroundColor = ORIGINAL_BACKGROUND_COLOR;
-      }
-      this.handleNextClick();
-    }, FIVE_SECONDS);
+    if (results[question].difficulty === 'medium') {
+      calculo = TEN + timer * MEDIUM;
+    }
+    if (results[question].difficulty === 'easy') {
+      calculo = TEN + timer;
+    }
+    addScore(calculo);
+
+    handleCorretAnswer();
+    const { getReduxState } = this.props;
+    getReduxState.player.score += calculo;
+    savePlayer(getReduxState);
+    this.setState({
+      buttonCLick: true,
+      incorrect: 'incorrect',
+      correct: 'correct',
+      isDisabled: true,
+    });
   }
 
   handleIncorrectClick() {
-    this.setState({ buttonCLick: true });
-    const { results, question } = this.state;
-    const getCorrect = document.querySelector('#correct');
-    const getIncorrects = results[question].incorrect_answers.length === 1
-      ? document.querySelector(INCORRECT)
-      : document.querySelectorAll(INCORRECT);
-    getCorrect.style.border = CORRECT_ANSWER_BORDER;
-    getCorrect.style.backgroundColor = CORRECT_ANSWER_BACKGROUND;
-    if (results[question].type === 'multiple') {
-      getIncorrects.forEach((el) => {
-        el.style.border = INCORRECT_ANSWER_BORDER;
-        el.style.backgroundColor = INCORRECT_ANSWER_BACKGROUND;
-      });
-    } else if (results[question].type === 'boolean') {
-      getIncorrects.style.border = INCORRECT_ANSWER_BORDER;
-      getIncorrects.style.backgroundColor = INCORRECT_ANSWER_BACKGROUND;
-    }
-    setTimeout(() => {
-      console.log('oi');
-      getCorrect.style.border = ORIGINAL_BORDER_COLOR;
-      getCorrect.style.backgroundColor = ORIGINAL_BACKGROUND_COLOR;
-      if (results[question].type === 'multiple') {
-        getIncorrects.forEach((el) => {
-          el.style.border = ORIGINAL_BORDER_COLOR;
-          el.style.backgroundColor = ORIGINAL_BACKGROUND_COLOR;
-        });
-      } else if (results[question].type === 'boolean') {
-        getIncorrects.style.border = ORIGINAL_BORDER_COLOR;
-        getIncorrects.style.backgroundColor = ORIGINAL_BACKGROUND_COLOR;
-      }
-      this.handleNextClick();
-    }, FIVE_SECONDS);
+    this.setState({
+      buttonCLick: true,
+      incorrect: 'incorrect',
+      correct: 'correct',
+      isDisabled: true,
+    });
   }
 
   handleAnswersRender() {
-    const { results, question } = this.state;
+    const { results, question, incorrect, correct, isDisabled } = this.state;
     return (
       <aside>
-        {results[question].incorrect_answers
+        {results[question].sorted
           .map((answer, index) => (
-            <button
-              className="incorrect"
-              key={ index }
-              type="button"
-              data-testid={ `wrong-answer-${index}` }
-              onClick={ this.handleIncorrectClick }
-            >
-              {answer}
-            </button>))
-          .concat((
-            <button
-              key="correct"
-              id="correct"
-              type="button"
-              data-testid="correct-answer"
-              onClick={ this.handleCorrectClick }
-            >
-              {results[question].correct_answer}
-            </button>
-          )).sort(() => Math.random() - ZERO_POINT_FIVE)}
-      </aside>
-    );
+            answer !== results[question].correct_answer
+              ? (
+                <button
+                  className={ incorrect }
+                  key={ index }
+                  type="button"
+                  data-testid={ `wrong-answer-${index}` }
+                  onClick={ this.handleIncorrectClick }
+                  disabled={ isDisabled }
+                >
+                  {answer}
+                </button>)
+              : (
+                <button
+                  key="correct"
+                  className={ correct }
+                  type="button"
+                  data-testid="correct-answer"
+                  onClick={ this.handleCorrectClick }
+                  disabled={ isDisabled }
+                >
+                  {answer}
+                </button>)
+          ))}
+      </aside>);
   }
 
   renderButtonNext() {
@@ -164,7 +164,7 @@ class GamePlayer extends React.Component {
       <button
         type="button"
         data-testid="btn-next"
-        onClick={ this.handleNextClick }
+        onClick={ this.handleNextQuestion }
       >
         Next
       </button>
@@ -172,10 +172,11 @@ class GamePlayer extends React.Component {
   }
 
   render() {
-    const { results, question, buttonCLick } = this.state;
+    const { results, question, buttonCLick, timer } = this.state;
     return (
       <>
         <Header />
+        <p>{timer}</p>
         {results.length > 0
           && (
             <div>
@@ -189,13 +190,20 @@ class GamePlayer extends React.Component {
   }
 }
 
+const mapStateToProps = (state) => ({
+  getReduxState: state,
+});
+
 const mapDispatchToProps = (dispatch) => ({
   handleCorretAnswer: () => dispatch(actionAddAssertion()),
+  addScore: (score) => dispatch(actionScore(score)),
 });
 
 GamePlayer.propTypes = {
   history: PropTypes.shape(Object).isRequired,
   handleCorretAnswer: PropTypes.func.isRequired,
+  getReduxState: PropTypes.func.isRequired,
+  addScore: PropTypes.func.isRequired,
 };
 
-export default connect(null, mapDispatchToProps)(GamePlayer);
+export default connect(mapStateToProps, mapDispatchToProps)(GamePlayer);
