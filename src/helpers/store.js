@@ -21,3 +21,8 @@ export function saveRanking(player) {
     localStorage.setItem('ranking', JSON.stringify([player]));
   }
 }
+
+export function getRanking() {
+  const ranking = localStorage.getItem('ranking');
+  return JSON.parse(ranking);
+}
