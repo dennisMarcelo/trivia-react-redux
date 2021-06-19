@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { getRanking } from '../helpers/store';
+import '../css/Ranking.css';
 
 class Ranking extends React.Component {
   constructor(props) {
@@ -38,7 +39,7 @@ class Ranking extends React.Component {
     const { ranking } = this.state;
 
     return (
-      <section>
+      <section className="raking-container">
         <h1 data-testid="ranking-title">Ranking</h1>
         <ol>
           {ranking.map((user, i) => this.userScore(user, i))}

@@ -2,26 +2,20 @@
   background-color: black;
   opacity: 0.3;
 }
+
 .login-container {
   align-items: center;
+  border: solid #4719eca2 0.8px;
+  border-radius: 4px;
+  box-shadow: inset 0 0 25px #4719eca2 , 0 0 25px #5023f3 , 0 0 252px #3c11fc;
   display: flex;
   flex-direction: column;
   height: 130px;
   justify-content: space-around;
+  margin: 200px auto;
   max-width: 500px;
-  margin: auto;
   padding: 10px;
-  border-radius: 4px;
-  border: solid grey 0.8px;
   text-align: center;
-  box-shadow: inset 0 0 1px #fff,
-  0 0 2px #fff,
-  0 0 4px #fff,
-  0 0 6px #6d13fe,
-  0 0 15px #6d13fe,
-  0 0 40px #591dfd,
-  0 0 60px #5023f3,
-  0 0 800px #3c11fc;
 }
 
 .login-container label {
@@ -29,44 +23,45 @@
 }
 
 .login-container input {
-  width: 100%;
-  padding: 4px 0;
-  border-radius: 4px;
-  border: solid #2633eb 0.8px;
-  text-align: center;
-  font-weight: 500;
-  font-family: fantasy;
   background-color: rgba(194, 190, 190, 0.829);
-  box-shadow: inset 0 0 1em #fff, 0 0 1em #2633eb;
-  color: #6d13fe
+  border: solid #2633eb 0.8px;
+  border-radius: 4px;
+  box-shadow: inset 0 0 1em white , 0 0 1em #2633eb;
+  color: #6d13fe;
+  font-family: fantasy;
+  font-weight: 500;
+  padding: 4px 0;
+  text-align: center;
+  width: 100%;
 }
 
+
 .login-container button {
-  width: 50px;
-  text-align: center;
-  font-family: fantasy;
   background-color: transparent;
   border: none;
   cursor: pointer;
+  font-family: fantasy;
   outline: none;
   overflow: hidden;
   padding: 0;
+  text-align: center;
+  width: 50px;
 }
 
 .login-container button img {
-  width: 100%;
   filter: saturate(200%) contrast(150%);
+  width: 100%;
 }
 
 .login-container section {
   display: flex;
   flex-direction: row;
-  width: 80%;
   justify-content: space-evenly;
+  width: 80%;
 }
 
 .transparente {
-  opacity : 0.3
+  opacity: 0.3;
 }
 
 /* Referências:

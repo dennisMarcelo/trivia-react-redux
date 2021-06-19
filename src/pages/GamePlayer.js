@@ -6,6 +6,9 @@ import { fetchQuestions } from '../helpers/fetchs';
 import { getToken, savePlayer, saveRanking } from '../helpers/store';
 import actionAddAssertion from '../Redux/action/actionAddAssertion';
 import actionScore from '../Redux/action/actionScore';
+import '../css/Game.css';
+import NextImg from '../images/icons8-divisa-circulada-à-direita-96.png';
+import Loading from '../components/Loding';
 
 const ZERO_POINT_FIVE = 0.5;
 const ONE_SECOND = 1000;
@@ -13,6 +16,7 @@ const TEN = 10;
 const HARD = 3;
 const MEDIUM = 2;
 const CATEGORY = 12;
+const SET_TIME_LOADING = 2000;
 
 class GamePlayer extends React.Component {
   constructor() {
@@ -25,6 +29,7 @@ class GamePlayer extends React.Component {
       incorrect: '',
       correct: '',
       isDisabled: false,
+      loading: true,
     };
 
     this.fetchQuestions = this.fetchQuestions.bind(this);
@@ -69,7 +74,10 @@ class GamePlayer extends React.Component {
       el.sorted = el.incorrect_answers.concat(el.correct_answer)
         .sort(() => Math.random() - ZERO_POINT_FIVE);
     });
-    this.setState({ results });
+    setTimeout(() => {
+      this.setState({ results },
+        () => this.setState({ loading: false }));
+    }, SET_TIME_LOADING);
     console.log(results);
   }
 
@@ -132,13 +140,13 @@ class GamePlayer extends React.Component {
   handleAnswersRender() {
     const { results, question, incorrect, correct, isDisabled } = this.state;
     return (
-      <aside>
+      <aside className="answers-btns">
         {results[question].sorted
           .map((answer, index) => (
             answer !== results[question].correct_answer
               ? (
                 <button
-                  className={ incorrect }
+                  className={ `${incorrect} test` }
                   key={ index }
                   type="button"
                   data-testid={ `wrong-answer-${index}` }
@@ -150,7 +158,7 @@ class GamePlayer extends React.Component {
               : (
                 <button
                   key="correct"
-                  className={ correct }
+                  className={ `${correct} test` }
                   type="button"
                   data-testid="correct-answer"
                   onClick={ this.handleCorrectClick }
@@ -165,29 +173,36 @@ class GamePlayer extends React.Component {
   renderButtonNext() {
     return (
       <button
+        className="btn-next"
         type="button"
         data-testid="btn-next"
         onClick={ this.handleNextQuestion }
       >
-        Next
+        <img src={ NextImg } alt="next" />
       </button>
     );
   }
 
   render() {
-    const { results, question, buttonCLick, timer } = this.state;
+    const { results, question, buttonCLick, timer, loading } = this.state;
     return (
       <>
-        <Header />
-        <p>{timer}</p>
-        {results.length > 0
-          && (
-            <div>
-              <h2 data-testid="question-category">{results[question].category}</h2>
-              <p data-testid="question-text">{results[question].question}</p>
-              {this.handleAnswersRender()}
-              {buttonCLick && this.renderButtonNext() }
-            </div>)}
+        <Header timer={ timer } />
+        <div className="answer-question">
+          {!loading && results.length > 0
+            ? (
+              <>
+                {/* <div className="question-cat-text"> */}
+                <div className="timer">{`TImer: ${timer}`}</div>
+                <h3 data-testid="question-category">{results[question].category}</h3>
+                <p data-testid="question-text">{results[question].question}</p>
+                {/* </div> */}
+                {this.handleAnswersRender()}
+                {buttonCLick && this.renderButtonNext() }
+              </>
+            )
+            : <Loading />}
+        </div>
       </>
     );
   }

@@ -2,6 +2,7 @@ import { connect } from 'react-redux';
 import React from 'react';
 import PropTypes from 'prop-types';
 import Header from '../components/Header';
+import '../css/Feedback.css';
 
 const MIN_SCORE = 3;
 
@@ -9,7 +10,7 @@ class Feedback extends React.Component {
   render() {
     const { assertions, score, history } = this.props;
     return (
-      <>
+      <div className="feedback-container">
         <Header />
         <h1 data-testid="feedback-text">
           {assertions >= MIN_SCORE ? 'Mandou bem!' : 'Podia ser melhor...'}
@@ -39,7 +40,7 @@ class Feedback extends React.Component {
           Ver Ranking
         </button>
 
-      </>
+      </div>
     );
   }
 }

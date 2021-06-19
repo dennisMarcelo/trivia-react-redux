@@ -1,0 +1,24 @@
+.header-content {
+  align-self: center;
+  background-color: rgba(10, 8, 8, 0.856);
+  box-shadow: inset 0 -3px 5px #4719eca2 , 0 5px 40px #4719eca2;
+  color: white;
+  display: flex;
+  justify-content: space-evenly;
+  padding: 10px 0;
+  width: 100%;
+}
+
+.header-content div {
+  align-items: center;
+  display: flex;
+}
+
+.header-content p {
+  margin: 0;
+}
+
+.header-content img {
+  height: 80px;
+  width: 80px;
+}
