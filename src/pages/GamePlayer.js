@@ -24,7 +24,6 @@ class GamePlayer extends React.Component {
       incorrect: '',
       correct: '',
       isDisabled: false,
-      assertions: 0,
     };
 
     this.fetchQuestions = this.fetchQuestions.bind(this);
@@ -93,15 +92,14 @@ class GamePlayer extends React.Component {
   }
 
   handleCorrectClick() {
-    this.setState((prevState) => ({
+    this.setState({
       buttonCLick: true,
       incorrect: 'incorrect',
       correct: 'correct',
       isDisabled: true,
-      assertions: prevState.assertions + 1,
-    }));
+    });
 
-    const { results, question, timer, assertions } = this.state;
+    const { results, question, timer } = this.state;
     const { handleCorretAnswer, addScore, getReduxState } = this.props;
 
     let calculo = 0;
@@ -117,7 +115,7 @@ class GamePlayer extends React.Component {
     addScore(calculo);
     handleCorretAnswer();
     getReduxState.player.score += calculo;
-    getReduxState.player.assertions = assertions + 1;
+    getReduxState.player.assertions += 1;
 
     savePlayer(getReduxState);
   }
