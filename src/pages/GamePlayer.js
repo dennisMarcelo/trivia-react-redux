@@ -114,7 +114,6 @@ class GamePlayer extends React.Component {
     if (results[question].difficulty === 'easy') {
       calculo = TEN + timer;
     }
-
     addScore(calculo);
     handleCorretAnswer();
     getReduxState.player.score += calculo;
