@@ -1,0 +1,75 @@
+.backgroud-black {
+  background-color: black;
+  opacity: 0.3;
+}
+.login-container {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  height: 130px;
+  justify-content: space-around;
+  max-width: 500px;
+  margin: auto;
+  padding: 10px;
+  border-radius: 4px;
+  border: solid grey 0.8px;
+  text-align: center;
+  box-shadow: inset 0 0 1px #fff,
+  0 0 2px #fff,
+  0 0 4px #fff,
+  0 0 6px #6d13fe,
+  0 0 15px #6d13fe,
+  0 0 40px #591dfd,
+  0 0 60px #5023f3,
+  0 0 800px #3c11fc;
+}
+
+.login-container label {
+  width: 90%;
+}
+
+.login-container input {
+  width: 100%;
+  padding: 4px 0;
+  border-radius: 4px;
+  border: solid #2633eb 0.8px;
+  text-align: center;
+  font-weight: 500;
+  font-family: fantasy;
+  background-color: rgba(194, 190, 190, 0.829);
+  box-shadow: inset 0 0 1em #fff, 0 0 1em #2633eb;
+  color: #6d13fe
+}
+
+.login-container button {
+  width: 50px;
+  text-align: center;
+  font-family: fantasy;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  overflow: hidden;
+  padding: 0;
+}
+
+.login-container button img {
+  width: 100%;
+  filter: saturate(200%) contrast(150%);
+}
+
+.login-container section {
+  display: flex;
+  flex-direction: row;
+  width: 80%;
+  justify-content: space-evenly;
+}
+
+.transparente {
+  opacity : 0.3
+}
+
+/* Referências:
+  filtro de imagem: https://www.maujor.com/tutorial/css3-filters.php
+  border: https://css-tricks.com/how-to-create-neon-text-with-css/
+*/

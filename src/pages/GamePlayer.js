@@ -12,6 +12,7 @@ const ONE_SECOND = 1000;
 const TEN = 10;
 const HARD = 3;
 const MEDIUM = 2;
+const CATEGORY = 12;
 
 class GamePlayer extends React.Component {
   constructor() {
@@ -63,7 +64,7 @@ class GamePlayer extends React.Component {
 
   async fetchQuestions() {
     const token = getToken();
-    const { results } = await fetchQuestions(token);
+    const { results } = await fetchQuestions(token, CATEGORY);
     results.forEach((el) => {
       el.sorted = el.incorrect_answers.concat(el.correct_answer)
         .sort(() => Math.random() - ZERO_POINT_FIVE);
@@ -116,7 +117,6 @@ class GamePlayer extends React.Component {
     handleCorretAnswer();
     getReduxState.player.score += calculo;
     getReduxState.player.assertions += 1;
-
     savePlayer(getReduxState);
   }
 

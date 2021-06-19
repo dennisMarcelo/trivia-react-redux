@@ -25,7 +25,7 @@ class Ranking extends React.Component {
 
   userScore(user, i) {
     return (
-      <li>
+      <li key={ i }>
         <img src={ user.picture } alt={ user.name } />
         <span data-testid={ `player-score-${i}` }>{`---${user.score}---`}</span>
         <span data-testid={ `player-name-${i}` }>{`${user.name}`}</span>
