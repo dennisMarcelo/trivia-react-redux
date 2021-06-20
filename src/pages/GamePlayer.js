@@ -89,11 +89,16 @@ class GamePlayer extends React.Component {
     const { results, question } = this.state;
     const { history, getReduxState: { player: {
       name, gravatarEmail, score } } } = this.props;
-    if (results[question].type === 'multiple') {
-      this.setState({ multiple: true });
-    }
-    if (results[question].type === 'boolean') {
-      this.setState({ boolean: true });
+    if (question < results.length - 1) {
+      if (results[question + 1].type === 'multiple') {
+        this.setState({ multiple: true });
+      }
+      if (results[question + 1].type === 'boolean') {
+        this.setState({ boolean: true });
+      }
+    } else {
+      saveRanking({ name, score, picture: gravatarEmail });
+      history.push('/feedback');
     }
     setTimeout(() => {
       if (question < results.length - 1) {
@@ -107,9 +112,6 @@ class GamePlayer extends React.Component {
           multiple: false,
           boolean: false,
         }));
-      } else {
-        saveRanking({ name, score, picture: gravatarEmail });
-        history.push('/feedback');
       }
     }, SET_TIME_LOADING);
   }
@@ -155,13 +157,13 @@ class GamePlayer extends React.Component {
     if (multiple) {
       return (
         <div className="answers-btns">
-          <img src={ Quiz } alt="Multipla escolha" />
+          <img src={ Quiz } alt="Multipla escolha" width="400px" />
         </div>);
     }
     if (boolean) {
       return (
         <div className="answers-btns">
-          <img src={ TruthOrFalse } alt="Verdadeiro ou Falso" />
+          <img src={ TruthOrFalse } alt="Verdadeiro ou Falso" width="250px" />
         </div>);
     } return (
       <aside className="answers-btns">
