@@ -9,6 +9,8 @@ import actionScore from '../Redux/action/actionScore';
 import '../css/Game.css';
 import NextImg from '../images/icons8-divisa-circulada-à-direita-96.png';
 import Loading from '../components/Loding';
+import Quiz from '../images/giphy (2).gif';
+import TruthOrFalse from '../images/gif-Truth-is-out-there.gif';
 
 const ZERO_POINT_FIVE = 0.5;
 const ONE_SECOND = 1000;
@@ -30,6 +32,8 @@ class GamePlayer extends React.Component {
       correct: '',
       isDisabled: false,
       loading: true,
+      multiple: false,
+      boolean: false,
     };
 
     this.fetchQuestions = this.fetchQuestions.bind(this);
@@ -85,19 +89,29 @@ class GamePlayer extends React.Component {
     const { results, question } = this.state;
     const { history, getReduxState: { player: {
       name, gravatarEmail, score } } } = this.props;
-    if (question < results.length - 1) {
-      this.setState((prevState) => ({
-        question: prevState.question + 1,
-        buttonCLick: false,
-        incorrect: '',
-        correct: '',
-        isDisabled: false,
-        timer: 30,
-      }));
-    } else {
-      saveRanking({ name, score, picture: gravatarEmail });
-      history.push('/feedback');
+    if (results[question].type === 'multiple') {
+      this.setState({ multiple: true });
     }
+    if (results[question].type === 'boolean') {
+      this.setState({ boolean: true });
+    }
+    setTimeout(() => {
+      if (question < results.length - 1) {
+        this.setState((prevState) => ({
+          question: prevState.question + 1,
+          buttonCLick: false,
+          incorrect: '',
+          correct: '',
+          isDisabled: false,
+          timer: 30,
+          multiple: false,
+          boolean: false,
+        }));
+      } else {
+        saveRanking({ name, score, picture: gravatarEmail });
+        history.push('/feedback');
+      }
+    }, SET_TIME_LOADING);
   }
 
   handleCorrectClick() {
@@ -107,10 +121,8 @@ class GamePlayer extends React.Component {
       correct: 'correct',
       isDisabled: true,
     });
-
     const { results, question, timer } = this.state;
     const { handleCorretAnswer, addScore, getReduxState } = this.props;
-
     let calculo = 0;
     if (results[question].difficulty === 'hard') {
       calculo = TEN + timer * HARD;
@@ -138,8 +150,20 @@ class GamePlayer extends React.Component {
   }
 
   handleAnswersRender() {
-    const { results, question, incorrect, correct, isDisabled } = this.state;
-    return (
+    const { results, question, incorrect,
+      correct, isDisabled, multiple, boolean } = this.state;
+    if (multiple) {
+      return (
+        <div className="answers-btns">
+          <img src={ Quiz } alt="Multipla escolha" />
+        </div>);
+    }
+    if (boolean) {
+      return (
+        <div className="answers-btns">
+          <img src={ TruthOrFalse } alt="Verdadeiro ou Falso" />
+        </div>);
+    } return (
       <aside className="answers-btns">
         {results[question].sorted
           .map((answer, index) => (
@@ -207,21 +231,17 @@ class GamePlayer extends React.Component {
     );
   }
 }
-
 const mapStateToProps = (state) => ({
   getReduxState: state,
 });
-
 const mapDispatchToProps = (dispatch) => ({
   handleCorretAnswer: () => dispatch(actionAddAssertion()),
   addScore: (score) => dispatch(actionScore(score)),
 });
-
 GamePlayer.propTypes = {
   history: PropTypes.shape(Object).isRequired,
   handleCorretAnswer: PropTypes.func.isRequired,
   getReduxState: PropTypes.func.isRequired,
   addScore: PropTypes.func.isRequired,
 };
-
 export default connect(mapStateToProps, mapDispatchToProps)(GamePlayer);

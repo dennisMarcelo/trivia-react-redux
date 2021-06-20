@@ -24,7 +24,13 @@
 
 .test {
   color: black;
-  margin: 2px;
+  cursor: pointer;
+  font-family: fantasy;
+  margin: 5px 0;
+  outline: none;
+  overflow: hidden;
+  padding: 0;
+  text-align: center;
   width: 200px;
 }
 

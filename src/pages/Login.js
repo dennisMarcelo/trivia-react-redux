@@ -9,6 +9,7 @@ import reloadAction from '../Redux/action/reloadAction';
 import '../css/Login.css';
 import ConfigImg from '../images/icons8-settings-128.png';
 import PlayGame from '../images/icons8-play-96.png';
+import LoginImg from '../images/giphy.gif';
 
 const REGEX_EMAIL = /^[a-z0-9.]+@[a-z0-9]+.[a-z]+(.[a-z]+)?$/i;
 
@@ -71,12 +72,9 @@ class Login extends React.Component {
     history.push('/gameplayer');
   }
 
-  render() {
-    const { isValidMail, isValidName } = this.state;
-    const { history } = this.props;
-
+  renderInputs() {
     return (
-      <div className="login-container">
+      <>
         <label htmlFor="name">
           <input
             type="text"
@@ -95,6 +93,19 @@ class Login extends React.Component {
             onChange={ this.handleChange }
           />
         </label>
+      </>
+    );
+  }
+
+  render() {
+    const { isValidMail, isValidName } = this.state;
+    const { history } = this.props;
+
+    return (
+      <div className="login-container">
+        <img src={ LoginImg } alt="Trivia" width="400px" />
+
+        {this.renderInputs()}
         <section>
           <button
             type="button"
