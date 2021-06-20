@@ -7,8 +7,6 @@ export function getToken() {
 }
 
 export function savePlayer(player) {
-  console.log(player);
-
   localStorage.setItem('state', JSON.stringify(player));
 }
 

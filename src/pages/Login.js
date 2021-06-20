@@ -9,7 +9,7 @@ import reloadAction from '../Redux/action/reloadAction';
 import '../css/Login.css';
 import ConfigImg from '../images/icons8-settings-128.png';
 import PlayGame from '../images/icons8-play-96.png';
-import LoginImg from '../images/giphy.gif';
+import LoginImg from '../images/28_generated.jpg';
 
 const REGEX_EMAIL = /^[a-z0-9.]+@[a-z0-9]+.[a-z]+(.[a-z]+)?$/i;
 

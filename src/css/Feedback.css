@@ -7,10 +7,15 @@
   color: #baade9;
   display: flex;
   flex-direction: column;
-  height: 400px;
   justify-content: space-around;
   margin: 100px auto;
-  padding: 10px;
+  padding: 4px;
   text-align: center;
   width: 550px;
+}
+
+.feedback-container h1 {
+  align-items: center;
+  display: flex;
+  font-size: xx-large;
 }
