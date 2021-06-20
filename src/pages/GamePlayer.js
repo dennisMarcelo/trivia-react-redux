@@ -128,11 +128,9 @@ class GamePlayer extends React.Component {
     let calculo = 0;
     if (results[question].difficulty === 'hard') {
       calculo = TEN + timer * HARD;
-    }
-    if (results[question].difficulty === 'medium') {
+    } else if (results[question].difficulty === 'medium') {
       calculo = TEN + timer * MEDIUM;
-    }
-    if (results[question].difficulty === 'easy') {
+    } else if (results[question].difficulty === 'easy') {
       calculo = TEN + timer;
     }
     addScore(calculo);
@@ -210,7 +208,9 @@ class GamePlayer extends React.Component {
   }
 
   render() {
-    const { results, question, buttonCLick, timer, loading } = this.state;
+    const { results, question, buttonCLick,
+      timer, loading, multiple, boolean } = this.state;
+    const hideInfo = !(multiple || boolean);
     return (
       <>
         <Header timer={ timer } />
@@ -218,11 +218,11 @@ class GamePlayer extends React.Component {
           {!loading && results.length > 0
             ? (
               <>
-                {/* <div className="question-cat-text"> */}
-                <div className="timer">{`TImer: ${timer}`}</div>
-                <h3 data-testid="question-category">{results[question].category}</h3>
-                <p data-testid="question-text">{results[question].question}</p>
-                {/* </div> */}
+                {hideInfo && <div className="timer">{`Timer: ${timer}`}</div>}
+                {hideInfo && (
+                  <h3 data-testid="question-category">{results[question].category}</h3>)}
+                {hideInfo && (
+                  <p data-testid="question-text">{results[question].question}</p>)}
                 {this.handleAnswersRender()}
                 {buttonCLick && this.renderButtonNext() }
               </>
