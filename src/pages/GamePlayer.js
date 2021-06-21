@@ -17,7 +17,6 @@ const ONE_SECOND = 1000;
 const TEN = 10;
 const HARD = 3;
 const MEDIUM = 2;
-const CATEGORY = 12;
 const SET_TIME_LOADING = 2000;
 
 class GamePlayer extends React.Component {
@@ -34,8 +33,8 @@ class GamePlayer extends React.Component {
       loading: true,
       multiple: false,
       boolean: false,
+      test: 'test',
     };
-
     this.fetchQuestions = this.fetchQuestions.bind(this);
     this.handleNextQuestion = this.handleNextQuestion.bind(this);
     this.handleAnswersRender = this.handleAnswersRender.bind(this);
@@ -45,8 +44,7 @@ class GamePlayer extends React.Component {
   }
 
   componentDidMount() {
-    this.fetchQuestions();
-    this.setTimerState();
+    this.fetchQuestions().then(() => this.setTimerState());
   }
 
   setTimerState() {
@@ -65,15 +63,14 @@ class GamePlayer extends React.Component {
           correct: 'correct',
         }));
       }
-      if (question === results.length - 1 && timer === 0) {
-        clearInterval(interval);
-      }
+      if (question === results.length - 1 && timer === 0) clearInterval(interval);
     }, ONE_SECOND);
   }
 
   async fetchQuestions() {
+    const { getReduxState: { config: { amount, category } } } = this.props;
     const token = getToken();
-    const { results } = await fetchQuestions(token, CATEGORY);
+    const { results } = await fetchQuestions(amount, token, category);
     results.forEach((el) => {
       el.sorted = el.incorrect_answers.concat(el.correct_answer)
         .sort(() => Math.random() - ZERO_POINT_FIVE);
@@ -126,13 +123,9 @@ class GamePlayer extends React.Component {
     const { results, question, timer } = this.state;
     const { handleCorretAnswer, addScore, getReduxState } = this.props;
     let calculo = 0;
-    if (results[question].difficulty === 'hard') {
-      calculo = TEN + timer * HARD;
-    } else if (results[question].difficulty === 'medium') {
-      calculo = TEN + timer * MEDIUM;
-    } else if (results[question].difficulty === 'easy') {
-      calculo = TEN + timer;
-    }
+    if (results[question].difficulty === 'hard') calculo = TEN + timer * HARD;
+    if (results[question].difficulty === 'medium') calculo = TEN + timer * MEDIUM;
+    if (results[question].difficulty === 'easy') calculo = TEN + timer;
     addScore(calculo);
     handleCorretAnswer();
     getReduxState.player.score += calculo;
@@ -151,7 +144,7 @@ class GamePlayer extends React.Component {
 
   handleAnswersRender() {
     const { results, question, incorrect,
-      correct, isDisabled, multiple, boolean } = this.state;
+      correct, isDisabled, multiple, boolean, test } = this.state;
     if (multiple) {
       return (
         <div className="answers-btns">
@@ -170,7 +163,7 @@ class GamePlayer extends React.Component {
             answer !== results[question].correct_answer
               ? (
                 <button
-                  className={ `${incorrect} test` }
+                  className={ `${incorrect} ${!isDisabled && test}` }
                   key={ index }
                   type="button"
                   data-testid={ `wrong-answer-${index}` }
@@ -182,7 +175,7 @@ class GamePlayer extends React.Component {
               : (
                 <button
                   key="correct"
-                  className={ `${correct} test` }
+                  className={ `${correct} ${!isDisabled && test} ` }
                   type="button"
                   data-testid="correct-answer"
                   onClick={ this.handleCorrectClick }
@@ -218,15 +211,18 @@ class GamePlayer extends React.Component {
           {!loading && results.length > 0
             ? (
               <>
-                {hideInfo && <div className="timer">{`Timer: ${timer}`}</div>}
                 {hideInfo && (
-                  <h3 data-testid="question-category">{results[question].category}</h3>)}
-                {hideInfo && (
-                  <p data-testid="question-text">{results[question].question}</p>)}
+                  <>
+                    <div className="timer">{`Timer: ${timer}`}</div>
+                    <h3 data-testid="question-category">{results[question].category}</h3>
+                    <p data-testid="question-text">{results[question].question}</p>
+                  </>)}
                 {this.handleAnswersRender()}
-                {buttonCLick && this.renderButtonNext() }
-              </>
-            )
+                {hideInfo && (
+                  <div className="btn-next">
+                    {buttonCLick && this.renderButtonNext() }
+                  </div>)}
+              </>)
             : <Loading />}
         </div>
       </>
@@ -243,7 +239,7 @@ const mapDispatchToProps = (dispatch) => ({
 GamePlayer.propTypes = {
   history: PropTypes.shape(Object).isRequired,
   handleCorretAnswer: PropTypes.func.isRequired,
-  getReduxState: PropTypes.func.isRequired,
+  getReduxState: PropTypes.shape(Object).isRequired,
   addScore: PropTypes.func.isRequired,
 };
 export default connect(mapStateToProps, mapDispatchToProps)(GamePlayer);

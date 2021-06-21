@@ -102,33 +102,35 @@ class Login extends React.Component {
     const { history } = this.props;
 
     return (
-      <div className="login-container">
-        <img src={ LoginImg } alt="Trivia" width="400px" />
+      <div className="container-padding-top">
+        <div className="login-container">
+          <img src={ LoginImg } alt="Trivia" width="400px" />
 
-        {this.renderInputs()}
-        <section>
-          <button
-            type="button"
-            data-testid="btn-settings"
-            onClick={ () => history.push('/config') }
-            id="config"
-          >
-            <img src={ ConfigImg } alt="settings" />
-          </button>
-          <button
-            type="button"
-            data-testid="btn-play"
-            disabled={ !(isValidMail && isValidName) }
-            onClick={ () => this.handleClick() }
-            id="play"
-          >
-            <img
-              src={ PlayGame }
-              alt="player"
-              className={ !(isValidMail && isValidName) ? 'transparente' : '' }
-            />
-          </button>
-        </section>
+          {this.renderInputs()}
+          <section>
+            <button
+              type="button"
+              data-testid="btn-settings"
+              onClick={ () => history.push('/config') }
+              id="config"
+            >
+              <img src={ ConfigImg } alt="settings" />
+            </button>
+            <button
+              type="button"
+              data-testid="btn-play"
+              disabled={ !(isValidMail && isValidName) }
+              onClick={ () => this.handleClick() }
+              id="play"
+            >
+              <img
+                src={ PlayGame }
+                alt="player"
+                className={ !(isValidMail && isValidName) ? 'transparente' : '' }
+              />
+            </button>
+          </section>
+        </div>
       </div>
     );
   }

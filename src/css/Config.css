@@ -14,3 +14,20 @@
   text-align: center;
   width: 550px;
 }
+
+button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  margin: 15px 0;
+  outline: none;
+  overflow: hidden;
+  padding: 0;
+  text-align: center;
+  width: 85px;
+}
+
+button img {
+  filter: saturate(200%) contrast(150%);
+  width: 100%;
+}
