@@ -29,10 +29,15 @@ body {
   align-items: center;
   display: flex;
   font-size: xx-large;
+  padding: 0 30px;
 }
 
 .buttons-controlers {
   display: flex;
   justify-content: space-evenly;
   width: 100%;
+}
+
+.text-hiden span {
+  font-size: 0;
 }

@@ -43,26 +43,28 @@ class Feedback extends React.Component {
             {assertions >= MIN_SCORE
               ? (
                 <>
-                  <span>Mandou bem!</span>
+                  <span>Awnsome... You have done a great job!!</span>
+                  <span fonte-size="0" className="text-hiden">Mandou bem!</span>
                   <img src={ Cheers } alt="Vibrating" height="80px" />
                 </>)
               : (
                 <>
                   <img src={ Damn } alt="Try Againg" height="80px" />
-                  <span>Podia ser melhor...</span>
+                  <span>Not good at all... You should TRY AGAIN!</span>
+                  <span className="text-hiden">Podia ser melhor...</span>
                 </>)}
           </h1>
           <h3>
-            {'Voce acertou '}
+            {'You had  '}
             <span data-testid="feedback-total-question">{assertions}</span>
-            {assertions === 1 ? ' questao' : ' questoes' }
+            {assertions <= 1 ? ' correct answer' : ' correct answers' }
           </h3>
           <h3>
-            { 'Seu score total foi de: '}
+            { 'Your total score was: '}
             <span data-testid="feedback-total-score">
               {score}
             </span>
-            {'  pontos'}
+            {score === 0 ? '' : ' points' }
           </h3>
           <div className="buttons-controlers">
             {this.buttonsControlers()}

@@ -4,8 +4,13 @@ export async function fetchToken() {
   return response.token;
 }
 
-export async function fetchQuestions(amount, token, category) {
-  const response = await fetch(`https://opentdb.com/api.php?amount=${amount}&category=${category}&token=${token}`)
+export async function fetchCategories() {
+  const response = await fetch('https://opentdb.com/api_category.php')
     .then((data) => data.json());
   return response;
 }
+export const fetchQuestions = (token) => async (amount, difficulty, type, category) => {
+  const response = await fetch(`https://opentdb.com/api.php?amount=${amount}&type=${type}&difficulty=${difficulty}&category=${category}&token=${token}`)
+    .then((data) => data.json());
+  return response;
+};

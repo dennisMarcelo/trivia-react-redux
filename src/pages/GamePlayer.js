@@ -8,7 +8,7 @@ import actionAddAssertion from '../Redux/action/actionAddAssertion';
 import actionScore from '../Redux/action/actionScore';
 import '../css/Game.css';
 import NextImg from '../images/icons8-divisa-circulada-à-direita-96.png';
-import Loading from '../components/Loding';
+import Loading from '../components/Loading';
 import Quiz from '../images/giphy (2).gif';
 import TruthOrFalse from '../images/gif-Truth-is-out-there.gif';
 
@@ -68,9 +68,9 @@ class GamePlayer extends React.Component {
   }
 
   async fetchQuestions() {
-    const { getReduxState: { config: { amount, category } } } = this.props;
+    const { getReduxState: { config: { amount, diff, type, category } } } = this.props;
     const token = getToken();
-    const { results } = await fetchQuestions(amount, token, category);
+    const { results } = await fetchQuestions(token)(amount, diff, type, category, token);
     results.forEach((el) => {
       el.sorted = el.incorrect_answers.concat(el.correct_answer)
         .sort(() => Math.random() - ZERO_POINT_FIVE);
@@ -154,7 +154,7 @@ class GamePlayer extends React.Component {
     if (boolean) {
       return (
         <div className="answers-btns">
-          <img src={ TruthOrFalse } alt="Verdadeiro ou Falso" width="250px" />
+          <img src={ TruthOrFalse } alt="Verdadeiro ou Falso" width="350px" />
         </div>);
     } return (
       <aside className="answers-btns">

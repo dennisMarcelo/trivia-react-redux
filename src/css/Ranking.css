@@ -1,7 +1,7 @@
 body {
   background-image: url('../images/parede-de-tijolo.jpg');
   background-size: cover;
-  height: 100vh;
+  min-height: 100vh;
 }
 
 .container-padding-top {
@@ -22,4 +22,31 @@ body {
   min-height: 550px;
   padding: 20px;
   text-align: center;
+}
+
+.raking-container img {
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.raking-container ol {
+  height: 450px;
+  overflow: auto;
+  width: 80%;
+}
+
+.raking-container ol li {
+  display: flex;
+  justify-content: flex-start;
+  margin: 20px 0;
+}
+
+.raking-container span {
+  align-self: center;
+  margin: 0 10px;
+}
+
+.container-padding-top h1 {
+  font-size: 2em;
+  margin: 5px 0;
 }
