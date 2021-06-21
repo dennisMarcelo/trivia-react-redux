@@ -38,6 +38,6 @@ body {
   width: 100%;
 }
 
-.text-hiden span {
+.text-hiden {
   font-size: 0;
 }
