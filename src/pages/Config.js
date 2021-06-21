@@ -2,49 +2,79 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import '../css/Config.css';
-import actionSelectedCategory from '../Redux/action/actionCategory';
 import GetBack from '../images/icons8-retornar-96.png';
-import actionQuestionsAmount from '../Redux/action/actionQuestionsAmount';
+import { selectedCategory,
+  questionsAmount,
+  questionType,
+  questionDifficulty }
+  from '../Redux/action/actionsConfig';
+import { fetchCategories } from '../helpers/fetchs';
+import Loading from '../images/config-load(2).gif';
+
+const SET_TIME_LOADING = 1000;
 
 class Config extends React.Component {
   constructor() {
     super();
-    this.state = { };
+    this.state = { category: [], loading: true };
+    this.handleNumerChange = this.handleNumerChange.bind(this);
+    this.setCategoriesState = this.setCategoriesState.bind(this);
+    this.handleDifficultyChange = this.handleDifficultyChange.bind(this);
+    this.handleTypeChange = this.handleTypeChange.bind(this);
     this.handleSelectedCategory = this.handleSelectedCategory.bind(this);
-    this.handleInputChange = this.handleInputChange.bind(this);
   }
 
-  handleInputChange({ target: { id, value } }) {
+  componentDidMount() {
+    this.setCategoriesState();
+  }
+
+  async setCategoriesState() {
+    const response = await fetchCategories().then((res) => (
+      res.trivia_categories.concat([{ id: 0, name: 'Any Category' }])
+    ));
+    response.sort((a, b) => a.id - b.id);
+    setTimeout(() => {
+      this.setState({ category: response }, () => this.setState({ loading: false }));
+    }, SET_TIME_LOADING);
+  }
+
+  handleNumerChange({ target: { id, value } }) {
     const { goAmount } = this.props;
-    goAmount(value);
+    goAmount(Number(value));
     this.setState({ [id]: value });
   }
 
-  handleSelectedCategory({ target: { id, value } }) {
+  handleDifficultyChange({ target: { id, value } }) {
+    const { goDifficulty } = this.props;
+    if (value === '0') goDifficulty(Number(value));
+    else goDifficulty(value);
+    this.setState({ [id]: value });
+  }
+
+  handleTypeChange({ target: { id, value } }) {
+    const { goType } = this.props;
+    if (value === '0') goType(Number(value));
+    else goType(value);
+    this.setState({ [id]: value });
+  }
+
+  handleSelectedCategory({ target: { value } }) {
     const { goCategory } = this.props;
     goCategory(Number(value));
-    this.setState({ [id]: value });
   }
 
   handleCategorySelect() {
     const { category } = this.state;
     return (
       <label htmlFor="category">
-        Selecione a Categoria:
+        Select Category:
         <select
           id="category"
           onChange={ this.handleSelectedCategory }
-          value={ category }
         >
-          <option value="9">General Knowledge</option>
-          <option value="10">Enterteinment: Books</option>
-          <option value="11">Enterteinment: Film</option>
-          <option value="12">Enterteinment: Music</option>
-          <option value="17">Science and Nature</option>
-          <option value="18">Science: Computers</option>
-          <option value="15">Video Games</option>
-          <option value="16">Board Games</option>
-          <option value="6">Japonese Anime and Manga</option>
+          {category.map((ele) => (
+            <option key={ ele.id } value={ ele.id }>{ele.name}</option>
+          ))}
         </select>
       </label>
     );
@@ -52,30 +82,62 @@ class Config extends React.Component {
 
   render() {
     const { history } = this.props;
+    const { loading } = this.state;
     return (
-      <div className="config-container">
-        <h1 data-testid="settings-title">Configuração</h1>
-        <label htmlFor="amount">
-          Quantidade de perguntas:
-          <input id="amount" type="number" onChange={ this.handleInputChange } />
-        </label>
-        {this.handleCategorySelect()}
-        <button type="button" onClick={ () => history.push('/') }>
-          <img src={ GetBack } alt="Get back to home page" />
-        </button>
-      </div>
+      !loading ? (
+        <div className="config-container">
+          <h1 data-testid="settings-title">Settings:</h1>
+          <label htmlFor="amount">
+            Number of Questions:
+            <input
+              id="amount"
+              type="number"
+              min="5"
+              onChange={ this.handleNumerChange }
+            />
+          </label>
+          <label htmlFor="difficulty" onChange={ this.handleDifficultyChange }>
+            Select Difficulty:
+            <select id="difficulty">
+              <option value="0">Any Difficulty</option>
+              <option value="easy">Easy</option>
+              <option value="medium">Medium</option>
+              <option value="hard">Hard</option>
+            </select>
+          </label>
+          <label htmlFor="type-anwser" onChange={ this.handleTypeChange }>
+            Select Type:
+            <select id="type-anwser">
+              <option value="0">Any Type</option>
+              <option value="boolean">True or False</option>
+              <option value="multiple">Multiple Choise</option>
+            </select>
+          </label>
+          {this.handleCategorySelect()}
+          <button type="button" onClick={ () => history.push('/') }>
+            <img src={ GetBack } alt="Get back to home page" />
+          </button>
+        </div>)
+        : (
+          <div className="config-container">
+            <img src={ Loading } width="100%" height="100%" alt="Other loading" />
+          </div>)
     );
   }
 }
 
 const mapDispatchToProps = (dispatch) => ({
-  goCategory: (category) => dispatch(actionSelectedCategory(category)),
-  goAmount: (amount) => dispatch(actionQuestionsAmount(amount)),
+  goCategory: (category) => dispatch(selectedCategory(category)),
+  goAmount: (amount) => dispatch(questionsAmount(amount)),
+  goType: (type) => dispatch(questionType(type)),
+  goDifficulty: (difficulty) => dispatch(questionDifficulty(difficulty)),
 });
 
 Config.propTypes = {
   goCategory: PropTypes.func.isRequired,
   goAmount: PropTypes.func.isRequired,
+  goType: PropTypes.func.isRequired,
+  goDifficulty: PropTypes.func.isRequired,
   history: PropTypes.shape(Object).isRequired,
 };
 

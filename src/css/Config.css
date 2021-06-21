@@ -15,6 +15,34 @@
   width: 550px;
 }
 
+
+/* label {
+  align-items: center;
+  display: flex;
+  font-size: medium;
+  font-weight: 600;
+} */
+
+/* label select {
+  border: solid #5023f3;
+  border-radius: 5px;
+  font-size: medium;
+  font-weight: 600;
+  margin: 0 10px;
+  padding: 3px;
+  text-align: center;
+}
+
+label input {
+  border: solid #5023f3;
+  border-radius: 5px;
+  font-size: medium;
+  font-weight: 600;
+  margin: 0 10px;
+  padding: 3px;
+  text-align: center;
+} */
+
 button {
   background-color: transparent;
   border: none;
