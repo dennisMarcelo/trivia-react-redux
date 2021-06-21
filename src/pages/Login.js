@@ -2,11 +2,16 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import md5 from 'crypto-js/md5';
-import logo from '../trivia.png';
 import setUserAction from '../Redux/action/setUserAction';
 import { fetchToken } from '../helpers/fetchs';
 import { savePlayer, saveToken } from '../helpers/store';
 import reloadAction from '../Redux/action/reloadAction';
+import '../css/Login.css';
+import ConfigImg from '../images/icons8-settings-128.png';
+import PlayGame from '../images/icons8-play-96.png';
+import LoginImg from '../images/28_generated.jpg';
+
+const REGEX_EMAIL = /^[a-z0-9.]+@[a-z0-9]+.[a-z]+(.[a-z]+)?$/i;
 
 class Login extends React.Component {
   constructor() {
@@ -43,7 +48,7 @@ class Login extends React.Component {
     const nameMin = 3;
     const { email, name } = this.state;
     this.setState({
-      isValidMail: email.match(/[a-z]+@[a-z]+.com/g),
+      isValidMail: email.match(REGEX_EMAIL),
       isValidName: name.length >= nameMin,
     });
   }
@@ -67,18 +72,9 @@ class Login extends React.Component {
     history.push('/gameplayer');
   }
 
-  render() {
-    const { isValidMail, isValidName } = this.state;
-    const { history } = this.props;
-
+  renderInputs() {
     return (
-      <section>
-        <header className="App-header">
-          <img src={ logo } className="App-logo" alt="logo" />
-          <p>
-            SUA VEZ
-          </p>
-        </header>
+      <>
         <label htmlFor="name">
           <input
             type="text"
@@ -97,22 +93,45 @@ class Login extends React.Component {
             onChange={ this.handleChange }
           />
         </label>
-        <button
-          type="button"
-          data-testid="btn-play"
-          disabled={ !(isValidMail && isValidName) }
-          onClick={ () => this.handleClick() }
-        >
-          Jogar
-        </button>
-        <button
-          type="button"
-          data-testid="btn-settings"
-          onClick={ () => history.push('/config') }
-        >
-          Configuração
-        </button>
-      </section>
+      </>
+    );
+  }
+
+  render() {
+    const { isValidMail, isValidName } = this.state;
+    const { history } = this.props;
+
+    return (
+      <div className="container-padding-top">
+        <div className="login-container">
+          <img src={ LoginImg } alt="Trivia" width="400px" />
+
+          {this.renderInputs()}
+          <section>
+            <button
+              type="button"
+              data-testid="btn-settings"
+              onClick={ () => history.push('/config') }
+              id="config"
+            >
+              <img src={ ConfigImg } alt="settings" />
+            </button>
+            <button
+              type="button"
+              data-testid="btn-play"
+              disabled={ !(isValidMail && isValidName) }
+              onClick={ () => this.handleClick() }
+              id="play"
+            >
+              <img
+                src={ PlayGame }
+                alt="player"
+                className={ !(isValidMail && isValidName) ? 'transparente' : '' }
+              />
+            </button>
+          </section>
+        </div>
+      </div>
     );
   }
 }

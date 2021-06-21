@@ -1,0 +1,25 @@
+body {
+  background-image: url('../images/parede-de-tijolo.jpg');
+  background-size: cover;
+  height: 100vh;
+}
+
+.container-padding-top {
+  padding-top: 100px;
+}
+
+.raking-container {
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.596);
+  border: solid #4719eca2 0.8px;
+  border-radius: 6px;
+  box-shadow: inset 0 0 35px #4719eca2 , 0 0 70px #5023f3;
+  color: #baade9;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  max-width: 650px;
+  min-height: 550px;
+  padding: 20px;
+  text-align: center;
+}

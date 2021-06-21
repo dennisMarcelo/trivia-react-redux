@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { getRanking } from '../helpers/store';
+import '../css/Ranking.css';
+import recover from '../images/icons8-reiniciar-96.png';
 
 class Ranking extends React.Component {
   constructor(props) {
@@ -25,7 +27,7 @@ class Ranking extends React.Component {
 
   userScore(user, i) {
     return (
-      <li>
+      <li key={ i }>
         <img src={ user.picture } alt={ user.name } />
         <span data-testid={ `player-score-${i}` }>{`---${user.score}---`}</span>
         <span data-testid={ `player-name-${i}` }>{`${user.name}`}</span>
@@ -38,19 +40,21 @@ class Ranking extends React.Component {
     const { ranking } = this.state;
 
     return (
-      <section>
-        <h1 data-testid="ranking-title">Ranking</h1>
-        <ol>
-          {ranking.map((user, i) => this.userScore(user, i))}
-        </ol>
-        <button
-          type="button"
-          data-testid="btn-go-home"
-          onClick={ () => history.push('/') }
-        >
-          Início
-        </button>
-      </section>
+      <div className="container-padding-top">
+        <section className="raking-container">
+          <h1 data-testid="ranking-title">Ranking</h1>
+          <ol>
+            {ranking.map((user, i) => this.userScore(user, i))}
+          </ol>
+          <button
+            type="button"
+            data-testid="btn-go-home"
+            onClick={ () => history.push('/') }
+          >
+            <img src={ recover } alt="recomeçar jogo" />
+          </button>
+        </section>
+      </div>
     );
   }
 }

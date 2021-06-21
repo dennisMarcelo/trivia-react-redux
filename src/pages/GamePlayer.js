@@ -6,12 +6,18 @@ import { fetchQuestions } from '../helpers/fetchs';
 import { getToken, savePlayer, saveRanking } from '../helpers/store';
 import actionAddAssertion from '../Redux/action/actionAddAssertion';
 import actionScore from '../Redux/action/actionScore';
+import '../css/Game.css';
+import NextImg from '../images/icons8-divisa-circulada-à-direita-96.png';
+import Loading from '../components/Loding';
+import Quiz from '../images/giphy (2).gif';
+import TruthOrFalse from '../images/gif-Truth-is-out-there.gif';
 
 const ZERO_POINT_FIVE = 0.5;
 const ONE_SECOND = 1000;
 const TEN = 10;
 const HARD = 3;
 const MEDIUM = 2;
+const SET_TIME_LOADING = 2000;
 
 class GamePlayer extends React.Component {
   constructor() {
@@ -24,9 +30,11 @@ class GamePlayer extends React.Component {
       incorrect: '',
       correct: '',
       isDisabled: false,
-      assertions: 0,
+      loading: true,
+      multiple: false,
+      boolean: false,
+      test: 'test',
     };
-
     this.fetchQuestions = this.fetchQuestions.bind(this);
     this.handleNextQuestion = this.handleNextQuestion.bind(this);
     this.handleAnswersRender = this.handleAnswersRender.bind(this);
@@ -36,8 +44,7 @@ class GamePlayer extends React.Component {
   }
 
   componentDidMount() {
-    this.fetchQuestions();
-    this.setTimerState();
+    this.fetchQuestions().then(() => this.setTimerState());
   }
 
   setTimerState() {
@@ -56,20 +63,22 @@ class GamePlayer extends React.Component {
           correct: 'correct',
         }));
       }
-      if (question === results.length - 1 && timer === 0) {
-        clearInterval(interval);
-      }
+      if (question === results.length - 1 && timer === 0) clearInterval(interval);
     }, ONE_SECOND);
   }
 
   async fetchQuestions() {
+    const { getReduxState: { config: { amount, category } } } = this.props;
     const token = getToken();
-    const { results } = await fetchQuestions(token);
+    const { results } = await fetchQuestions(amount, token, category);
     results.forEach((el) => {
       el.sorted = el.incorrect_answers.concat(el.correct_answer)
         .sort(() => Math.random() - ZERO_POINT_FIVE);
     });
-    this.setState({ results });
+    setTimeout(() => {
+      this.setState({ results },
+        () => this.setState({ loading: false }));
+    }, SET_TIME_LOADING);
     console.log(results);
   }
 
@@ -78,47 +87,49 @@ class GamePlayer extends React.Component {
     const { history, getReduxState: { player: {
       name, gravatarEmail, score } } } = this.props;
     if (question < results.length - 1) {
-      this.setState((prevState) => ({
-        question: prevState.question + 1,
-        buttonCLick: false,
-        incorrect: '',
-        correct: '',
-        isDisabled: false,
-        timer: 30,
-      }));
+      if (results[question + 1].type === 'multiple') {
+        this.setState({ multiple: true });
+      }
+      if (results[question + 1].type === 'boolean') {
+        this.setState({ boolean: true });
+      }
     } else {
       saveRanking({ name, score, picture: gravatarEmail });
       history.push('/feedback');
     }
+    setTimeout(() => {
+      if (question < results.length - 1) {
+        this.setState((prevState) => ({
+          question: prevState.question + 1,
+          buttonCLick: false,
+          incorrect: '',
+          correct: '',
+          isDisabled: false,
+          timer: 30,
+          multiple: false,
+          boolean: false,
+        }));
+      }
+    }, SET_TIME_LOADING);
   }
 
   handleCorrectClick() {
-    this.setState((prevState) => ({
+    this.setState({
       buttonCLick: true,
       incorrect: 'incorrect',
       correct: 'correct',
       isDisabled: true,
-      assertions: prevState.assertions + 1,
-    }));
-
-    const { results, question, timer, assertions } = this.state;
+    });
+    const { results, question, timer } = this.state;
     const { handleCorretAnswer, addScore, getReduxState } = this.props;
-
     let calculo = 0;
-    if (results[question].difficulty === 'hard') {
-      calculo = TEN + timer * HARD;
-    }
-    if (results[question].difficulty === 'medium') {
-      calculo = TEN + timer * MEDIUM;
-    }
-    if (results[question].difficulty === 'easy') {
-      calculo = TEN + timer;
-    }
+    if (results[question].difficulty === 'hard') calculo = TEN + timer * HARD;
+    if (results[question].difficulty === 'medium') calculo = TEN + timer * MEDIUM;
+    if (results[question].difficulty === 'easy') calculo = TEN + timer;
     addScore(calculo);
     handleCorretAnswer();
     getReduxState.player.score += calculo;
-    getReduxState.player.assertions = assertions + 1;
-
+    getReduxState.player.assertions += 1;
     savePlayer(getReduxState);
   }
 
@@ -132,15 +143,27 @@ class GamePlayer extends React.Component {
   }
 
   handleAnswersRender() {
-    const { results, question, incorrect, correct, isDisabled } = this.state;
-    return (
-      <aside>
+    const { results, question, incorrect,
+      correct, isDisabled, multiple, boolean, test } = this.state;
+    if (multiple) {
+      return (
+        <div className="answers-btns">
+          <img src={ Quiz } alt="Multipla escolha" width="400px" />
+        </div>);
+    }
+    if (boolean) {
+      return (
+        <div className="answers-btns">
+          <img src={ TruthOrFalse } alt="Verdadeiro ou Falso" width="250px" />
+        </div>);
+    } return (
+      <aside className="answers-btns">
         {results[question].sorted
           .map((answer, index) => (
             answer !== results[question].correct_answer
               ? (
                 <button
-                  className={ incorrect }
+                  className={ `${incorrect} ${!isDisabled && test}` }
                   key={ index }
                   type="button"
                   data-testid={ `wrong-answer-${index}` }
@@ -152,7 +175,7 @@ class GamePlayer extends React.Component {
               : (
                 <button
                   key="correct"
-                  className={ correct }
+                  className={ `${correct} ${!isDisabled && test} ` }
                   type="button"
                   data-testid="correct-answer"
                   onClick={ this.handleCorrectClick }
@@ -167,48 +190,56 @@ class GamePlayer extends React.Component {
   renderButtonNext() {
     return (
       <button
+        className="btn-next"
         type="button"
         data-testid="btn-next"
         onClick={ this.handleNextQuestion }
       >
-        Next
+        <img src={ NextImg } alt="next" />
       </button>
     );
   }
 
   render() {
-    const { results, question, buttonCLick, timer } = this.state;
+    const { results, question, buttonCLick,
+      timer, loading, multiple, boolean } = this.state;
+    const hideInfo = !(multiple || boolean);
     return (
       <>
-        <Header />
-        <p>{timer}</p>
-        {results.length > 0
-          && (
-            <div>
-              <h2 data-testid="question-category">{results[question].category}</h2>
-              <p data-testid="question-text">{results[question].question}</p>
-              {this.handleAnswersRender()}
-              {buttonCLick && this.renderButtonNext() }
-            </div>)}
+        <Header timer={ timer } />
+        <div className="answer-question">
+          {!loading && results.length > 0
+            ? (
+              <>
+                {hideInfo && (
+                  <>
+                    <div className="timer">{`Timer: ${timer}`}</div>
+                    <h3 data-testid="question-category">{results[question].category}</h3>
+                    <p data-testid="question-text">{results[question].question}</p>
+                  </>)}
+                {this.handleAnswersRender()}
+                {hideInfo && (
+                  <div className="btn-next">
+                    {buttonCLick && this.renderButtonNext() }
+                  </div>)}
+              </>)
+            : <Loading />}
+        </div>
       </>
     );
   }
 }
-
 const mapStateToProps = (state) => ({
   getReduxState: state,
 });
-
 const mapDispatchToProps = (dispatch) => ({
   handleCorretAnswer: () => dispatch(actionAddAssertion()),
   addScore: (score) => dispatch(actionScore(score)),
 });
-
 GamePlayer.propTypes = {
   history: PropTypes.shape(Object).isRequired,
   handleCorretAnswer: PropTypes.func.isRequired,
-  getReduxState: PropTypes.func.isRequired,
+  getReduxState: PropTypes.shape(Object).isRequired,
   addScore: PropTypes.func.isRequired,
 };
-
 export default connect(mapStateToProps, mapDispatchToProps)(GamePlayer);
