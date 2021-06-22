@@ -35,7 +35,7 @@ class GamePlayer extends React.Component {
       boolean: false,
       test: 'test',
     };
-    this.fetchQuestions = this.fetchQuestions.bind(this);
+    this.fetchAPIQuestions = this.fetchAPIQuestions.bind(this);
     this.handleNextQuestion = this.handleNextQuestion.bind(this);
     this.handleAnswersRender = this.handleAnswersRender.bind(this);
     this.handleCorrectClick = this.handleCorrectClick.bind(this);
@@ -67,7 +67,7 @@ class GamePlayer extends React.Component {
     }, ONE_SECOND);
   }
 
-  async fetchQuestions() {
+  async fetchAPIQuestions() {
     const { getReduxState: { config: { amount, diff, type, category } } } = this.props;
     const token = getToken();
     const { results } = await fetchQuestions(token)(amount, diff, type, category, token);
