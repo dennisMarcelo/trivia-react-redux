@@ -44,7 +44,7 @@ class GamePlayer extends React.Component {
   }
 
   componentDidMount() {
-    this.fetchQuestions().then(() => this.setTimerState());
+    this.fetchAPIQuestions().then(() => this.setTimerState());
   }
 
   setTimerState() {
